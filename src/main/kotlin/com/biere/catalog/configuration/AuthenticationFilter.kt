@@ -1,12 +1,11 @@
 package com.biere.catalog.configuration
 
-import com.biere.catalog.core.exceptions.NotAuthorized
+import com.biere.catalog.core.exceptions.NotAuthorizedException
 import com.biere.catalog.core.services.TokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -22,11 +21,11 @@ class AuthenticationFilter(private val tokenService: TokenService, private val u
     ){
         val header: String? = request.getHeader("Authorization")
         if (header == null || !header.contains("Bearer ")){
-            throw NotAuthorized("Token not provided")
+            throw NotAuthorizedException("Token not provided")
         }
         val token: String = header.split("Bearer ")[1]
         if (!tokenService.isTokenValid(token)) {
-            throw NotAuthorized("Invalid token")
+            throw NotAuthorizedException("Invalid token")
         }
         val username = "janael"
         val userDetails = userDetailsService.loadUserByUsername(username)
