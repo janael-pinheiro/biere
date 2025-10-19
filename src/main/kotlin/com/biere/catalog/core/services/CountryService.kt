@@ -4,13 +4,14 @@ import com.biere.catalog.core.dto.CountryRegistrationDTO
 import com.biere.catalog.core.dto.CountryResponseDTO
 import com.biere.catalog.core.dto.MultipleCountriesResponseDTO
 import com.biere.catalog.core.exceptions.ConflictException
+import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.infrastructure.entities.CountryEntity
 import com.biere.catalog.infrastructure.repositories.CountryRepository
-import org.postgresql.util.PSQLException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
-import kotlin.streams.toList
+import java.util.NoSuchElementException
+import java.util.Optional
 
 @Service
 class CountryService(private val countryRepository: CountryRepository) {
@@ -36,7 +37,13 @@ class CountryService(private val countryRepository: CountryRepository) {
 
     fun getSpecificCountry(countryId: Long): CountryResponseDTO{
         val country = this.countryRepository.findById(countryId)
+        if(country.isEmpty) {
+            throw NotFoundException("Country not found.")
+        }
         return CountryResponseDTO(name = country.get().name)
     }
 
+    fun deleteCountry(countryId: Long) {
+        this.countryRepository.deleteById(countryId)
+    }
 }

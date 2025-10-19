@@ -3,6 +3,7 @@ package com.biere.catalog.configuration
 import com.biere.catalog.core.dto.ApiError
 import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotAuthorizedException
+import com.biere.catalog.core.exceptions.NotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -38,6 +39,20 @@ class RestExceptionHandler {
             path = request.servletPath
         )
         return ResponseEntity(apiError, HttpStatus.CONFLICT)
+    }
+
+    @ExceptionHandler(NotFoundException::class)
+    fun handleNotFoundException(
+        ex: NotFoundException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiError> {
+        val apiError = ApiError(
+            status = HttpStatus.NOT_FOUND.value(),
+            error = HttpStatus.NOT_FOUND.reasonPhrase,
+            message = ex.message,
+            path = request.servletPath
+        )
+        return ResponseEntity(apiError, HttpStatus.NOT_FOUND)
     }
 
 }
