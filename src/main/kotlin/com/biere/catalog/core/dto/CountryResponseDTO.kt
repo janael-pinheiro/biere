@@ -1,5 +1,3 @@
 package com.biere.catalog.core.dto
 
-import lombok.Builder
-
-data class CountryResponseDTO(val name: String)
+data class CountryResponseDTO(val id: Long?, val name: String)

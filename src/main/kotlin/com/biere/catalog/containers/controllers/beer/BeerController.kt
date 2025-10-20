@@ -22,7 +22,9 @@ class BeerController(val beerService: BeerService){
     fun register(@RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<BeerRegistrationResponseDTO> {
         val beerId = this.beerService.register(beerRegistrationDTO)
         return ResponseEntity.created(URI("")).body(
-            BeerRegistrationResponseDTO(listOf("GET /v1/beers/$beerId")))
+            BeerRegistrationResponseDTO(listOf(
+                "GET /v1/beers/$beerId",
+                "PATCH /v1/beers/$beerId")))
     }
 
     @GetMapping("/{beerId}")

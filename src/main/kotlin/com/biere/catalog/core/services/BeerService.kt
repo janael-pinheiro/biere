@@ -6,14 +6,15 @@ import com.biere.catalog.core.dto.BeerUpdateRequestDTO
 import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.infrastructure.entities.BeerEntity
 import com.biere.catalog.infrastructure.repositories.BeerRepository
+import com.biere.catalog.infrastructure.repositories.BreweryRepository
 import com.biere.catalog.infrastructure.repositories.CountryRepository
 import org.springframework.stereotype.Service
 
 @Service
-class BeerService(private val beerRepository: BeerRepository, private val countryRepository: CountryRepository) {
+class BeerService(private val beerRepository: BeerRepository, private val countryRepository: CountryRepository, val breweryRepository: BreweryRepository) {
     fun register(inputBeer: BeerRegistrationDTO): Long? {
-        val country = this.countryRepository.findById(inputBeer.countryId)
-        val beer = BeerEntity(name = inputBeer.name, country = country.get(), alcoholContent = inputBeer.alcoholContent, brewery = inputBeer.brewery)
+        val brewery = breweryRepository.findById(inputBeer.breweryId).get()
+        val beer = BeerEntity(name = inputBeer.name, alcoholContent = inputBeer.alcoholContent, brewery = brewery)
         val savedBeer = this.beerRepository.save(beer)
         return savedBeer.id
     }
@@ -26,17 +27,17 @@ class BeerService(private val beerRepository: BeerRepository, private val countr
         val beer = optionalBeer.get()
         return BeerResponseDTO(
             name = beer.name,
-            countryName = beer.country.name,
+            countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
-            brewery = beer.brewery)
+            brewery = beer.brewery.name)
     }
 
     fun updateBeer(beerId: Long, beerUpdate: BeerUpdateRequestDTO): BeerResponseDTO{
         val country = this.countryRepository.findById(beerUpdate.countryId)
         val beer = this.beerRepository.findById(beerId).get()
-        beer.country = country.get()
+        beer.brewery.country = country.get()
         this.beerRepository.save(beer)
-        return BeerResponseDTO(name = beer.name, countryName = beer.country.name, alcoholContent = beer.alcoholContent, brewery = beer.brewery)
+        return BeerResponseDTO(name = beer.name, countryName = beer.brewery.country.name, alcoholContent = beer.alcoholContent, brewery = beer.brewery.name)
 
     }
 }

@@ -10,8 +10,6 @@ import com.biere.catalog.infrastructure.repositories.CountryRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
-import java.util.NoSuchElementException
-import java.util.Optional
 
 @Service
 class CountryService(private val countryRepository: CountryRepository) {
@@ -31,7 +29,7 @@ class CountryService(private val countryRepository: CountryRepository) {
 
     fun getCountries(): MultipleCountriesResponseDTO {
         val countries =
-            MultipleCountriesResponseDTO(countries = this.countryRepository.findAll().stream().map { country -> CountryResponseDTO(name = country.name) }.toList())
+            MultipleCountriesResponseDTO(countries = this.countryRepository.findAll().stream().map { country -> CountryResponseDTO(id = country.id, name = country.name) }.toList())
         return countries
     }
 
@@ -40,7 +38,7 @@ class CountryService(private val countryRepository: CountryRepository) {
         if(country.isEmpty) {
             throw NotFoundException("Country not found.")
         }
-        return CountryResponseDTO(name = country.get().name)
+        return CountryResponseDTO(id = country.get().id, name = country.get().name)
     }
 
     fun deleteCountry(countryId: Long) {
