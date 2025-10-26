@@ -22,6 +22,6 @@ class BreweryService(private val breweryRepository: BreweryRepository, private v
         if(brewery.isEmpty){
             throw NotFoundException("Brewery not found.")
         }
-        return BreweryResponseDTO(id = brewery.get().id, countryName = brewery.get().country.name)
+        return BreweryResponseDTO(id = brewery.get().id, name = brewery.get().name, countryName = brewery.get().country.name)
     }
 }

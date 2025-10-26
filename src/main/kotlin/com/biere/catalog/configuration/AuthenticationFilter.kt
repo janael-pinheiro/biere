@@ -1,10 +1,11 @@
 package com.biere.catalog.configuration
 
 import com.biere.catalog.core.exceptions.NotAuthorizedException
-import com.biere.catalog.core.services.TokenService
+import com.biere.catalog.core.services.UserService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.context.annotation.Profile
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -12,8 +13,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
+@Profile("dev")
 @Component
-class AuthenticationFilter(private val tokenService: TokenService, private val userDetailsService: UserDetailsService): OncePerRequestFilter() {
+class AuthenticationFilter(private val userService: UserService, private val userDetailsService: UserDetailsService): OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -24,10 +26,10 @@ class AuthenticationFilter(private val tokenService: TokenService, private val u
             throw NotAuthorizedException("Token not provided")
         }
         val token: String = header.split("Bearer ")[1]
-        if (!tokenService.isTokenValid(token)) {
+        if (!userService.isTokenValid(token)) {
             throw NotAuthorizedException("Invalid token")
         }
-        val username = "janael"
+        val username = userService.getEmailFromToken(token)
         val userDetails = userDetailsService.loadUserByUsername(username)
         val authToken = UsernamePasswordAuthenticationToken(
             userDetails,

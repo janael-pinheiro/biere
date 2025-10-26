@@ -1,0 +1,2 @@
+CREATE TABLE beers(id SERIAL PRIMARY KEY, name VARCHAR(255), country_id integer, alcohol_content float, brewery VARCHAR(255));
+ALTER TABLE beers ADD CONSTRAINT fk_country_id FOREIGN KEY (country_id) REFERENCES countries(id);

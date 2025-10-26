@@ -1,0 +1,1 @@
+CREATE TABLE countries (id SERIAL PRIMARY KEY, name varchar(255), created_at timestamp with time zone);

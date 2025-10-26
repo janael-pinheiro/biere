@@ -1,0 +1,1 @@
+ALTER TABLE countries DROP CONSTRAINT unique_name;
