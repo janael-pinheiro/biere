@@ -1,22 +1,33 @@
 package com.biere.catalog.core.services
 
-import com.biere.catalog.core.dto.BeerRegistrationDTO
-import com.biere.catalog.core.dto.BeerResponseDTO
-import com.biere.catalog.core.dto.BeerUpdateRequestDTO
+import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
+import com.biere.catalog.containers.api.dtos.BeerResponseDTO
+import com.biere.catalog.containers.api.dtos.BeerUpdateRequestDTO
 import com.biere.catalog.core.exceptions.NotFoundException
-import com.biere.catalog.infrastructure.entities.BeerEntity
-import com.biere.catalog.infrastructure.repositories.BeerRepository
-import com.biere.catalog.infrastructure.repositories.BreweryRepository
-import com.biere.catalog.infrastructure.repositories.CountryRepository
+import com.biere.catalog.adapters.entities.BeerEntity
+import com.biere.catalog.adapters.repositories.BeerRepository
+import com.biere.catalog.adapters.repositories.BreweryRepository
+import com.biere.catalog.adapters.repositories.CountryRepository
+import com.biere.catalog.adapters.repositories.StyleRepository
 import org.springframework.stereotype.Service
 
 @Service
-class BeerService(private val beerRepository: BeerRepository, private val countryRepository: CountryRepository, val breweryRepository: BreweryRepository) {
-    fun register(inputBeer: BeerRegistrationDTO): Long? {
+class BeerService(
+    private val beerRepository: BeerRepository,
+    private val countryRepository: CountryRepository,
+    private val breweryRepository: BreweryRepository,
+    private val styleRepository: StyleRepository) {
+    fun register(inputBeer: BeerRegistrationDTO): BeerResponseDTO {
         val brewery = breweryRepository.findById(inputBeer.breweryId).get()
-        val beer = BeerEntity(name = inputBeer.name, alcoholContent = inputBeer.alcoholContent, brewery = brewery)
+        val style = styleRepository.findById(inputBeer.styleId).get()
+        val beer = BeerEntity(name = inputBeer.name, alcoholContent = inputBeer.alcoholContent, brewery = brewery, style = style)
         val savedBeer = this.beerRepository.save(beer)
-        return savedBeer.id
+        return BeerResponseDTO(
+            id = savedBeer.id ?: 0,
+            name = savedBeer.name,
+            countryName = savedBeer.brewery.country.name,
+            alcoholContent = savedBeer.alcoholContent,
+            brewery = savedBeer.brewery.name)
     }
 
     fun getSpecificBeer(beerId: Long): BeerResponseDTO {
@@ -26,6 +37,7 @@ class BeerService(private val beerRepository: BeerRepository, private val countr
         }
         val beer = optionalBeer.get()
         return BeerResponseDTO(
+            id = beer.id ?: 0,
             name = beer.name,
             countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
@@ -37,7 +49,11 @@ class BeerService(private val beerRepository: BeerRepository, private val countr
         val beer = this.beerRepository.findById(beerId).get()
         beer.brewery.country = country.get()
         this.beerRepository.save(beer)
-        return BeerResponseDTO(name = beer.name, countryName = beer.brewery.country.name, alcoholContent = beer.alcoholContent, brewery = beer.brewery.name)
-
+        return BeerResponseDTO(
+            id = beer.id ?: 0,
+            name = beer.name,
+            countryName = beer.brewery.country.name,
+            alcoholContent = beer.alcoholContent,
+            brewery = beer.brewery.name)
     }
 }

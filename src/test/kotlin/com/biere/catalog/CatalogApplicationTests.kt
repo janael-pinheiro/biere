@@ -8,7 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.testcontainers.junit.jupiter.Testcontainers
 
-@SpringBootTest
+@SpringBootTest(classes = [com.biere.catalog.containers.api.CatalogApplication::class])
 @Testcontainers
 @EnableAutoConfiguration(exclude=[SecurityAutoConfiguration::class])
 class CatalogApplicationTests {

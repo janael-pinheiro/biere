@@ -1,9 +1,9 @@
 package com.biere.catalog.core.services
 
-import com.biere.catalog.containers.controllers.authentication.TokenRequestDTO
-import com.biere.catalog.containers.controllers.authentication.TokenResponseDTO
+import com.biere.catalog.adapters.repositories.UserRepository
+import com.biere.catalog.containers.api.controllers.authentication.TokenRequestDTO
+import com.biere.catalog.containers.api.controllers.authentication.TokenResponseDTO
 import com.biere.catalog.core.exceptions.NotAuthorizedException
-import com.biere.catalog.infrastructure.repositories.UserRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts

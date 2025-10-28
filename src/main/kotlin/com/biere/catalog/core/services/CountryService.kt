@@ -5,8 +5,8 @@ import com.biere.catalog.core.dto.CountryResponseDTO
 import com.biere.catalog.core.dto.MultipleCountriesResponseDTO
 import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotFoundException
-import com.biere.catalog.infrastructure.entities.CountryEntity
-import com.biere.catalog.infrastructure.repositories.CountryRepository
+import com.biere.catalog.adapters.entities.CountryEntity
+import com.biere.catalog.adapters.repositories.CountryRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime

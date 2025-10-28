@@ -3,9 +3,9 @@ package com.biere.catalog.core.services
 import com.biere.catalog.core.dto.BreweryRegistrationDTO
 import com.biere.catalog.core.dto.BreweryResponseDTO
 import com.biere.catalog.core.exceptions.NotFoundException
-import com.biere.catalog.infrastructure.entities.BreweryEntity
-import com.biere.catalog.infrastructure.repositories.BreweryRepository
-import com.biere.catalog.infrastructure.repositories.CountryRepository
+import com.biere.catalog.adapters.entities.BreweryEntity
+import com.biere.catalog.adapters.repositories.BreweryRepository
+import com.biere.catalog.adapters.repositories.CountryRepository
 import org.springframework.stereotype.Service
 
 @Service
