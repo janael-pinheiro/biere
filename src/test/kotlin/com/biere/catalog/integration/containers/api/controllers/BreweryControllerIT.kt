@@ -1,12 +1,12 @@
 package com.biere.catalog.integration.containers.api.controllers
 
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
-import com.biere.catalog.core.dto.BreweryRegistrationDTO
-import com.biere.catalog.core.dto.BreweryRegistrationResponseDTO
-import com.biere.catalog.core.dto.BreweryResponseDTO
+import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.repositories.BreweryRepository
 import com.biere.catalog.adapters.repositories.CountryRepository
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,7 +52,7 @@ class BreweryControllerIT(
             .bodyValue(newBrewery)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(BreweryRegistrationResponseDTO::class.java)
+            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val brewery = response.responseBody
                 assertEquals(1, brewery?.links?.size)
             }
@@ -68,7 +68,7 @@ class BreweryControllerIT(
             .bodyValue(newBrewery)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(BreweryRegistrationResponseDTO::class.java)
+            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val breweryResponse = response.responseBody
                 breweryUrl =
                     breweryResponse?.links?.stream()?.filter { brewery -> brewery.contains("GET") }?.toList()?.get(0).toString().split(" ")[1]

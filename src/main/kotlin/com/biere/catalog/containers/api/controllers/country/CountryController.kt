@@ -1,9 +1,9 @@
 package com.biere.catalog.containers.api.controllers.country
 
-import com.biere.catalog.core.dto.CountryRegistrationDTO
-import com.biere.catalog.core.dto.CountryRegistrationResponseDTO
-import com.biere.catalog.core.dto.CountryResponseDTO
-import com.biere.catalog.core.dto.MultipleCountriesResponseDTO
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
+import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.CountryResponseDTO
+import com.biere.catalog.containers.api.dtos.MultipleCountriesResponseDTO
 import com.biere.catalog.core.services.CountryService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -19,12 +19,12 @@ import java.net.URI
 @RequestMapping("/v1/countries")
 class CountryController(private val countryService: CountryService) {
     @PostMapping
-    fun registerCountry(@RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<CountryRegistrationResponseDTO> {
-        val countryId: Long? = this.countryService.registerCountry(countryRegistrationDTO)
-        return ResponseEntity.created(URI("")).body(
-            CountryRegistrationResponseDTO(listOf(
-                "GET /v1/countries/$countryId",
-                "DELETE /v1/countries/$countryId")));
+    fun registerCountry(@RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<CountryResponseDTO>> {
+        val country = this.countryService.registerCountry(countryRegistrationDTO)
+        val links = listOf(
+            "GET /v1/countries/${country.id}",
+            "DELETE /v1/countries/${country.id}")
+        return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = country, links = links));
     }
 
     @GetMapping

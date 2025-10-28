@@ -1,4 +1,4 @@
-package com.biere.catalog.core.dto
+package com.biere.catalog.containers.api.dtos
 
 import java.time.LocalDateTime
 

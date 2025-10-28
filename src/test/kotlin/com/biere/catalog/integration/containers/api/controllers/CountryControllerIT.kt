@@ -1,10 +1,10 @@
 package com.biere.catalog.integration.containers.api.controllers
 
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
-import com.biere.catalog.core.dto.CountryRegistrationDTO
-import com.biere.catalog.core.dto.CountryRegistrationResponseDTO
-import com.biere.catalog.core.dto.MultipleCountriesResponseDTO
+import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.MultipleCountriesResponseDTO
 import com.biere.catalog.adapters.repositories.CountryRepository
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -50,7 +50,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(name = newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(CountryRegistrationResponseDTO::class.java)
+            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val country = response.responseBody
                 assertEquals(2, country?.links?.size)
             }
@@ -77,7 +77,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(CountryRegistrationResponseDTO::class.java)
+            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
                 countryUrl =
                     countries?.links?.stream()?.filter{ country -> country.contains("GET")}?.toList()?.get(0).toString().split(" ")[1]
@@ -104,7 +104,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(CountryRegistrationResponseDTO::class.java)
+            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
                 countryUrl =
                     countries?.links?.stream()?.filter{ country -> country.contains("DELETE")}?.toList()?.get(0).toString().split(" ")[1]

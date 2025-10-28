@@ -1,8 +1,8 @@
 package com.biere.catalog.containers.api.controllers.brewery
 
-import com.biere.catalog.core.dto.BreweryRegistrationDTO
-import com.biere.catalog.core.dto.BreweryRegistrationResponseDTO
-import com.biere.catalog.core.dto.BreweryResponseDTO
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
+import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.core.services.BreweryService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,9 +17,10 @@ import java.net.URI
 @RequestMapping("/v1/breweries")
 class BreweryController(private val breweryService: BreweryService) {
     @PostMapping
-    fun register(@RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<BreweryRegistrationResponseDTO>{
-        val breweryId = this.breweryService.register(inputBrewery)
-        return ResponseEntity.created(URI("")).body(BreweryRegistrationResponseDTO(listOf("GET /v1/breweries/$breweryId")))
+    fun register(@RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<BreweryResponseDTO>>{
+        val brewery = this.breweryService.register(inputBrewery)
+        val links = listOf("GET /v1/breweries/${brewery.id}")
+        return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = brewery, links = links))
     }
 
     @GetMapping("/{breweryId}")

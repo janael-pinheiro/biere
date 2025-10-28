@@ -1,7 +1,7 @@
 package com.biere.catalog.core.services
 
-import com.biere.catalog.core.dto.BreweryRegistrationDTO
-import com.biere.catalog.core.dto.BreweryResponseDTO
+import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.repositories.BreweryRepository
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class BreweryService(private val breweryRepository: BreweryRepository, private val countryRepository: CountryRepository) {
-    fun register(inputBrewery: BreweryRegistrationDTO): Long? {
+    fun register(inputBrewery: BreweryRegistrationDTO): BreweryResponseDTO {
         val country = countryRepository.findById(inputBrewery.countryId).get()
         val newBrewery = BreweryEntity(name = inputBrewery.name, country = country)
         val savedBrewery = breweryRepository.save(newBrewery)
-        return savedBrewery.id
+        return BreweryResponseDTO(id = savedBrewery.id ?: 0, name = savedBrewery.name, countryName = savedBrewery.country.name)
     }
 
     fun getSpecificBrewery(breweryId: Long): BreweryResponseDTO {

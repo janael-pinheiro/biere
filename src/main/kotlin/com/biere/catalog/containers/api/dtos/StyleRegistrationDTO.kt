@@ -1,3 +1,5 @@
 package com.biere.catalog.containers.api.dtos
 
-data class StyleRegistrationDTO(val name: String)
+import org.jetbrains.annotations.NotNull
+
+data class StyleRegistrationDTO(@NotNull val name: String)

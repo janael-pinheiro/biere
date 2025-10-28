@@ -1,6 +1,6 @@
 package com.biere.catalog.configuration
 
-import com.biere.catalog.core.dto.ApiError
+import com.biere.catalog.containers.api.dtos.ApiError
 import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotAuthorizedException
 import com.biere.catalog.core.exceptions.NotFoundException
