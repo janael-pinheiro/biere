@@ -26,10 +26,8 @@ class CountryService(private val countryRepository: CountryRepository) {
         return CountryResponseDTO(id = savedCountry?.id, name = savedCountry?.name)
     }
 
-    fun getCountries(): MultipleCountriesResponseDTO {
-        val countries =
-            MultipleCountriesResponseDTO(countries = this.countryRepository.findAll().stream().map { country -> CountryResponseDTO(id = country.id, name = country.name) }.toList())
-        return countries
+    fun getCountries(): List<CountryResponseDTO> {
+        return this.countryRepository.findAll().stream().map { country -> CountryResponseDTO(id = country.id, name = country.name) }.toList()
     }
 
     fun getSpecificCountry(countryId: Long): CountryResponseDTO{

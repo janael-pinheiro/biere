@@ -14,4 +14,6 @@ data class BeerResponseDTO(
     @CsvBindByName(column = "brewery")
     val brewery: String,
     @CsvBindByName(column = "style")
-    val style: String)
+    val style: String,
+    @CsvBindByName(column = "year")
+    val year: Long)

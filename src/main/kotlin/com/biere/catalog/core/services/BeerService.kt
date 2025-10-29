@@ -26,7 +26,7 @@ class BeerService(
     fun register(inputBeer: BeerRegistrationDTO): BeerResponseDTO {
         val brewery = breweryRepository.findById(inputBeer.breweryId).get()
         val style = styleRepository.findById(inputBeer.styleId).get()
-        val beer = BeerEntity(name = inputBeer.name, alcoholContent = inputBeer.alcoholContent, brewery = brewery, style = style)
+        val beer = BeerEntity(name = inputBeer.name, alcoholContent = inputBeer.alcoholContent, brewery = brewery, style = style, year = inputBeer.year)
         val savedBeer = this.beerRepository.save(beer)
         return BeerResponseDTO(
             id = savedBeer.id ?: 0,
@@ -34,7 +34,8 @@ class BeerService(
             countryName = savedBeer.brewery.country.name,
             alcoholContent = savedBeer.alcoholContent,
             brewery = savedBeer.brewery.name,
-            style = savedBeer.style.name)
+            style = savedBeer.style.name,
+            year = savedBeer.year)
     }
 
     fun getBeers(): List<BeerResponseDTO>{
@@ -45,7 +46,8 @@ class BeerService(
             countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
             brewery = beer.brewery.name,
-            style = beer.style.name) }.toList()
+            style = beer.style.name,
+            year = beer.year) }.toList()
     }
 
     fun generateCsv(beers: List<BeerResponseDTO>): ByteArray {
@@ -70,7 +72,8 @@ class BeerService(
             countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
             brewery = beer.brewery.name,
-            style = beer.style.name)
+            style = beer.style.name,
+            year = beer.year)
     }
 
     fun updateBeer(beerId: Long, beerUpdate: BeerUpdateRequestDTO): BeerResponseDTO{
@@ -84,6 +87,7 @@ class BeerService(
             countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
             brewery = beer.brewery.name,
-            style = beer.style.name)
+            style = beer.style.name,
+            year = beer.year)
     }
 }

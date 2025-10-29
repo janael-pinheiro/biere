@@ -4,6 +4,7 @@ import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
 import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.core.services.BreweryService
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,14 +17,14 @@ import java.net.URI
 @RestController
 @RequestMapping("/v1/breweries")
 class BreweryController(private val breweryService: BreweryService) {
-    @PostMapping
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun register(@RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<BreweryResponseDTO>>{
         val brewery = this.breweryService.register(inputBrewery)
         val links = listOf("GET /v1/breweries/${brewery.id}")
         return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = brewery, links = links))
     }
 
-    @GetMapping("/{breweryId}")
+    @GetMapping("/{breweryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificBrewery(@PathVariable breweryId: Long): ResponseEntity<BreweryResponseDTO>{
         val brewery = this.breweryService.getSpecificBrewery(breweryId)
         return ResponseEntity.ok(brewery)
