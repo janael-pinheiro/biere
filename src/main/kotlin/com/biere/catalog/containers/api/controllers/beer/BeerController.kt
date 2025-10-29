@@ -1,5 +1,6 @@
 package com.biere.catalog.containers.api.controllers.beer
 
+import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
 import com.biere.catalog.containers.api.dtos.BeerResponseDTO
@@ -20,6 +21,12 @@ class BeerController(private val beerService: BeerService){
             "PATCH /v1/beers/${beer.id}")
         val response = ApiGeneralRegistrationResponseDTO(data = beer, links = links)
         return ResponseEntity.created(URI("")).body(response)
+    }
+
+    @GetMapping
+    fun getBeers(): ResponseEntity<ApiCollectionResponseDTO<List<BeerResponseDTO>>>{
+        val beers = this.beerService.getBeers()
+        return ResponseEntity.ok(ApiCollectionResponseDTO(data = beers))
     }
 
     @GetMapping("/{beerId}")

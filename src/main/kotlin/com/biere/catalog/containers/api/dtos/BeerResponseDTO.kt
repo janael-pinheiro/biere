@@ -5,4 +5,5 @@ data class BeerResponseDTO(
     val name: String,
     val countryName: String,
     val alcoholContent: Float,
-    val brewery: String)
+    val brewery: String,
+    val style: String)

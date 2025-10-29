@@ -1,5 +1,6 @@
 package com.biere.catalog.integration.containers.api.controllers
 
+import com.biere.catalog.adapters.entities.BeerEntity
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
 import com.biere.catalog.containers.api.dtos.BeerResponseDTO
@@ -11,6 +12,7 @@ import com.biere.catalog.adapters.repositories.BeerRepository
 import com.biere.catalog.adapters.repositories.BreweryRepository
 import com.biere.catalog.adapters.repositories.CountryRepository
 import com.biere.catalog.adapters.repositories.StyleRepository
+import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -37,13 +39,15 @@ class BeerControllerIT(
 
     private val beersUri = "/v1/beers"
     private lateinit var newBeer: BeerRegistrationDTO
+    private lateinit var brewery: BreweryEntity
+    private lateinit var style: StyleEntity
 
     @BeforeEach
     fun setup(){
         val country = CountryEntity(name="Netherlands", createdAt = ZonedDateTime.now())
         val savedCountry = this.countryRepository.save(country)
-        val brewery = this.breweryRepository.save(BreweryEntity(name = "Heineken", country = savedCountry))
-        val style = this.styleRepository.save(StyleEntity(name = "lager"))
+        brewery = this.breweryRepository.save(BreweryEntity(name = "Heineken", country = savedCountry))
+        style = this.styleRepository.save(StyleEntity(name = "lager"))
         newBeer = BeerRegistrationDTO(name = "Heineken", countryId = savedCountry.id ?: 0, alcoholContent = 4.5F, breweryId = brewery.id ?: 0, style.id ?: 0)
     }
 
@@ -96,6 +100,20 @@ class BeerControllerIT(
     }
 
     @Test
+    fun `get multiple beers`(){
+        this.registerBeers()
+        webTestClient
+            .get()
+            .uri(beersUri)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(ApiCollectionResponseDTO::class.java)
+            .consumeWith { response -> val beers = response.responseBody
+                assertEquals(2, (beers?.data as List<*>).size )
+            }
+    }
+
+    @Test
     fun `update a beer`(){
         val country = CountryEntity(name="Belgium", createdAt = ZonedDateTime.now())
         val savedCountry = this.countryRepository.save(country)
@@ -131,5 +149,18 @@ class BeerControllerIT(
                 assertEquals(newBeer.name, beer?.name)
                 assertEquals(savedCountry.name, beer?.countryName)
             }
+    }
+
+    private fun registerBeers(){
+        this.beerRepository.save(BeerEntity(
+            name = "Heineken",
+            alcoholContent = 4.6F,
+            brewery = this.brewery,
+            style = this.style))
+        this.beerRepository.save(BeerEntity(
+            name = "Amstel",
+            alcoholContent = 4.6F,
+            brewery = this.brewery,
+            style = this.style))
     }
 }

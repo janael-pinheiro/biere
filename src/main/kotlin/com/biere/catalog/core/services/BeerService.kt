@@ -27,7 +27,19 @@ class BeerService(
             name = savedBeer.name,
             countryName = savedBeer.brewery.country.name,
             alcoholContent = savedBeer.alcoholContent,
-            brewery = savedBeer.brewery.name)
+            brewery = savedBeer.brewery.name,
+            style = savedBeer.style.name)
+    }
+
+    fun getBeers(): List<BeerResponseDTO>{
+        val beers = beerRepository.findAll()
+        return beers.stream().map { beer -> BeerResponseDTO(
+            id = beer.id ?: 0,
+            name = beer.name,
+            countryName = beer.brewery.country.name,
+            alcoholContent = beer.alcoholContent,
+            brewery = beer.brewery.name,
+            style = beer.style.name) }.toList()
     }
 
     fun getSpecificBeer(beerId: Long): BeerResponseDTO {
@@ -41,7 +53,8 @@ class BeerService(
             name = beer.name,
             countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
-            brewery = beer.brewery.name)
+            brewery = beer.brewery.name,
+            style = beer.style.name)
     }
 
     fun updateBeer(beerId: Long, beerUpdate: BeerUpdateRequestDTO): BeerResponseDTO{
@@ -54,6 +67,7 @@ class BeerService(
             name = beer.name,
             countryName = beer.brewery.country.name,
             alcoholContent = beer.alcoholContent,
-            brewery = beer.brewery.name)
+            brewery = beer.brewery.name,
+            style = beer.style.name)
     }
 }
