@@ -42,6 +42,8 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 	implementation("org.projectlombok:lombok:1.18.42")
 
+	implementation("com.opencsv:opencsv:5.7.1")
+
 	// Flyway
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-database-postgresql")

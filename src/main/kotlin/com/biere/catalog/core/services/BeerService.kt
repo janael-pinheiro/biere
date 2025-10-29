@@ -9,7 +9,13 @@ import com.biere.catalog.adapters.repositories.BeerRepository
 import com.biere.catalog.adapters.repositories.BreweryRepository
 import com.biere.catalog.adapters.repositories.CountryRepository
 import com.biere.catalog.adapters.repositories.StyleRepository
+import com.opencsv.CSVWriter
+import com.opencsv.bean.StatefulBeanToCsvBuilder
 import org.springframework.stereotype.Service
+import java.io.ByteArrayOutputStream
+import java.io.OutputStream
+import java.io.StringWriter
+import java.nio.charset.StandardCharsets
 
 @Service
 class BeerService(
@@ -40,6 +46,16 @@ class BeerService(
             alcoholContent = beer.alcoholContent,
             brewery = beer.brewery.name,
             style = beer.style.name) }.toList()
+    }
+
+    fun generateCsv(beers: List<BeerResponseDTO>): ByteArray {
+        val writer = StringWriter()
+        val beanToCsv = StatefulBeanToCsvBuilder<BeerResponseDTO>(writer)
+            .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+            .withApplyQuotesToAll(false)
+            .build()
+        beanToCsv.write(beers)
+        return writer.toString().toByteArray(StandardCharsets.UTF_8)
     }
 
     fun getSpecificBeer(beerId: Long): BeerResponseDTO {

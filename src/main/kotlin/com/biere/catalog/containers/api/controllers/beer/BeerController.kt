@@ -6,9 +6,19 @@ import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
 import com.biere.catalog.containers.api.dtos.BeerResponseDTO
 import com.biere.catalog.containers.api.dtos.BeerUpdateRequestDTO
 import com.biere.catalog.core.services.BeerService
+import com.opencsv.CSVWriter
+import com.opencsv.bean.StatefulBeanToCsv
+import com.opencsv.bean.StatefulBeanToCsvBuilder
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.Resource
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.OutputStream
+import java.io.StringWriter
 import java.net.URI
+import java.nio.charset.StandardCharsets
 
 @RestController
 @RequestMapping("/v1/beers")
@@ -23,10 +33,22 @@ class BeerController(private val beerService: BeerService){
         return ResponseEntity.created(URI("")).body(response)
     }
 
-    @GetMapping
-    fun getBeers(): ResponseEntity<ApiCollectionResponseDTO<List<BeerResponseDTO>>>{
+    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getBeersJson(): ResponseEntity<ApiCollectionResponseDTO<List<BeerResponseDTO>>>{
         val beers = this.beerService.getBeers()
         return ResponseEntity.ok(ApiCollectionResponseDTO(data = beers))
+    }
+
+    @GetMapping(produces = ["text/csv"])
+    fun getBeersCsv(): ResponseEntity<ByteArrayResource>{
+        val beers = this.beerService.getBeers()
+        val output = this.beerService.generateCsv(beers)
+        val resource = ByteArrayResource(output)
+        return ResponseEntity
+            .ok()
+            .header("Content-Disposition", "attachment; filename=\"beers.csv\"")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(resource)
     }
 
     @GetMapping("/{beerId}")

@@ -21,10 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.ZonedDateTime
 import kotlin.test.assertEquals
+import kotlin.text.get
 
 @AutoConfigureWebTestClient
 @Import(PostgresTestContainersConfiguration::class)
@@ -100,16 +102,36 @@ class BeerControllerIT(
     }
 
     @Test
-    fun `get multiple beers`(){
+    fun `get multiple beers as JSON`(){
         this.registerBeers()
         webTestClient
             .get()
             .uri(beersUri)
+            .header("Accept", "application/json")
             .exchange()
             .expectStatus().isOk
             .expectBody(ApiCollectionResponseDTO::class.java)
             .consumeWith { response -> val beers = response.responseBody
                 assertEquals(2, (beers?.data as List<*>).size )
+            }
+            .consumeWith { response -> val responseHeaders = response.responseHeaders
+                assertEquals("application/json", responseHeaders.get("Content-Type")?.get(0).toString())
+            }
+    }
+
+    @Test
+    fun `get multiple beers as CSV`(){
+        this.registerBeers()
+        webTestClient
+            .get()
+            .uri(beersUri)
+            .header("Accept", "text/csv")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(ByteArrayResource::class.java)
+            .consumeWith { response -> val responseHeaders = response.responseHeaders
+                assertEquals("text/csv", responseHeaders.get("Content-Type")?.get(0).toString())
+                assertEquals("attachment; filename=\"beers.csv\"", responseHeaders.get("Content-Disposition")?.get(0).toString())
             }
     }
 
