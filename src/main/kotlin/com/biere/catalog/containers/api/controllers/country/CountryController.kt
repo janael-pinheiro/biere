@@ -1,6 +1,8 @@
 package com.biere.catalog.containers.api.controllers.country
 
 import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationMetadataDTO
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationOperationsDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
 import com.biere.catalog.containers.api.dtos.CountryResponseDTO
@@ -27,13 +29,14 @@ class CountryController(private val countryService: CountryService) {
         val links = listOf(
             "GET /v1/countries/${country.id}",
             "DELETE /v1/countries/${country.id}")
-        return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = country, links = links));
+        return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = country, metadata = ApiGeneralRegistrationMetadataDTO(
+            ApiGeneralRegistrationOperationsDTO(null, null, null))));
     }
 
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCountries(): ResponseEntity<ApiCollectionResponseDTO<List<CountryResponseDTO>>>{
         val countries = this.countryService.getCountries()
-        return ResponseEntity.ok(ApiCollectionResponseDTO(data = countries))
+        return ResponseEntity.ok(ApiCollectionResponseDTO(data = countries, page = null))
     }
 
     @GetMapping("/{countryId}", produces = [MediaType.APPLICATION_JSON_VALUE])

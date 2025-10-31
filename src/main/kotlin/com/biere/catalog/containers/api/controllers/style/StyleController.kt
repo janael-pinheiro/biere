@@ -1,5 +1,7 @@
 package com.biere.catalog.containers.api.controllers.style
 
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationMetadataDTO
+import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationOperationsDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
@@ -20,8 +22,8 @@ class StyleController(private val styleService: StyleService) {
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun register(@RequestBody inputStyle: StyleRegistrationDTO) : ResponseEntity<ApiGeneralRegistrationResponseDTO<StyleResponseDTO>>{
         val outputStyle = styleService.register(inputStyle)
-        val apiResponse = ApiGeneralRegistrationResponseDTO(data = outputStyle, links = listOf(
-            "GET /v1/styles/${outputStyle.id}"))
+        val apiResponse = ApiGeneralRegistrationResponseDTO(data = outputStyle, metadata = ApiGeneralRegistrationMetadataDTO(
+            ApiGeneralRegistrationOperationsDTO(null, null, null)))
         return ResponseEntity.created(URI("")).body(apiResponse)
     }
 
