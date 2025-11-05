@@ -1,9 +1,9 @@
 package com.biere.catalog.integration.containers.api.controllers
 
-import com.biere.catalog.containers.api.controllers.authentication.TokenRequestDTO
-import com.biere.catalog.containers.api.controllers.authentication.TokenResponseDTO
+import com.biere.catalog.containers.api.controllers.user.TokenRequestDTO
+import com.biere.catalog.containers.api.controllers.user.TokenResponseDTO
 import com.biere.catalog.adapters.entities.UserEntity
-import com.biere.catalog.adapters.repositories.UserRepository
+import com.biere.catalog.adapters.output.repositories.UserRepository
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

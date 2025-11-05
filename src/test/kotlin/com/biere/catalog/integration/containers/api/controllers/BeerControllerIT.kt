@@ -8,10 +8,10 @@ import com.biere.catalog.containers.api.dtos.BeerUpdateRequestDTO
 import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.entities.StyleEntity
-import com.biere.catalog.adapters.repositories.BeerRepository
-import com.biere.catalog.adapters.repositories.BreweryRepository
-import com.biere.catalog.adapters.repositories.CountryRepository
-import com.biere.catalog.adapters.repositories.StyleRepository
+import com.biere.catalog.adapters.output.repositories.BeerRepository
+import com.biere.catalog.adapters.output.repositories.BreweryRepository
+import com.biere.catalog.adapters.output.repositories.CountryRepository
+import com.biere.catalog.adapters.output.repositories.StyleRepository
 import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
@@ -26,7 +26,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.ZonedDateTime
 import kotlin.test.assertEquals
-import kotlin.text.get
 
 @AutoConfigureWebTestClient
 @Import(PostgresTestContainersConfiguration::class)

@@ -42,6 +42,6 @@ class AuthenticationFilter(private val userService: UserService, private val use
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return request.servletPath in listOf("/v1/login", "/error")
+        return request.servletPath in listOf("/v1/users/login", "/error")
     }
 }

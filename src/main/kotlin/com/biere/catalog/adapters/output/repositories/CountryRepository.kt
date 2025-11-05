@@ -1,4 +1,4 @@
-package com.biere.catalog.adapters.repositories
+package com.biere.catalog.adapters.output.repositories
 
 import com.biere.catalog.adapters.entities.CountryEntity
 import org.springframework.data.jpa.repository.JpaRepository

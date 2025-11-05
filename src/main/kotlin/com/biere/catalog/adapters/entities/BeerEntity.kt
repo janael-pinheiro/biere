@@ -13,8 +13,8 @@ import jakarta.persistence.Table
 @Table(name = "beers")
 class BeerEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
-    val name: String,
-    val alcoholContent: Float,
+    var name: String,
+    var alcoholContent: Float,
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "brewery_id") val brewery: BreweryEntity,
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "style_id") val style: StyleEntity,
-    val year: Long)
+    var year: Long)

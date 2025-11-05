@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @EntityScan(basePackages = ["com.biere.catalog.adapters.entities"])
-@EnableJpaRepositories(basePackages = ["com.biere.catalog.adapters.repositories"])
+@EnableJpaRepositories(basePackages = ["com.biere.catalog.adapters.output.repositories"])
 @SpringBootApplication(scanBasePackages = ["com.biere.catalog"])
 class CatalogApplication
 

@@ -25,7 +25,7 @@ class SecurityConfiguration(private val authenticationFilter: AuthenticationFilt
             .sessionManagement { session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/v1/login").permitAll()
+                    .requestMatchers("/v1/users/login").permitAll()
                     .anyRequest().hasAuthority("ROLE_USER") }
             .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter::class.java)
         return http.build()

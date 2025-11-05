@@ -1,13 +1,16 @@
 package com.biere.catalog.core.services
 
-import com.biere.catalog.adapters.repositories.UserRepository
-import com.biere.catalog.containers.api.controllers.authentication.TokenRequestDTO
-import com.biere.catalog.containers.api.controllers.authentication.TokenResponseDTO
+import com.biere.catalog.adapters.entities.UserEntity
+import com.biere.catalog.adapters.output.repositories.UserRepository
+import com.biere.catalog.containers.api.controllers.user.TokenRequestDTO
+import com.biere.catalog.containers.api.controllers.user.TokenResponseDTO
 import com.biere.catalog.core.exceptions.NotAuthorizedException
+import com.biere.catalog.core.models.InputUser
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.io.Encoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -63,5 +66,14 @@ class UserService(
             .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
             .build()
             .parseSignedClaims(token)
+    }
+
+    fun registerUser(user: InputUser): Long {
+        val encodedPassword = Encoders.BASE64.encode(user.toString().toByteArray(Charsets.UTF_8))
+        return userRepository.save(UserEntity(name = user.name, email = user.email, password = encodedPassword)).id ?:0
+    }
+
+    fun removeUser(userId: Long) {
+        userRepository.deleteById(userId)
     }
 }

@@ -4,8 +4,8 @@ import com.biere.catalog.integration.configuration.PostgresTestContainersConfigu
 import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
 import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.adapters.entities.CountryEntity
-import com.biere.catalog.adapters.repositories.BreweryRepository
-import com.biere.catalog.adapters.repositories.CountryRepository
+import com.biere.catalog.adapters.output.repositories.BreweryRepository
+import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

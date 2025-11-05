@@ -3,7 +3,7 @@ package com.biere.catalog.integration.containers.api.controllers
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
 import com.biere.catalog.containers.api.dtos.MultipleCountriesResponseDTO
-import com.biere.catalog.adapters.repositories.CountryRepository
+import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test

@@ -26,9 +26,9 @@ class CountryController(private val countryService: CountryService) {
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun registerCountry(@RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.registerCountry(countryRegistrationDTO)
-        val links = listOf(
-            "GET /v1/countries/${country.id}",
-            "DELETE /v1/countries/${country.id}")
+//        val links = listOf(
+//            "GET /v1/countries/${country.id}",
+//            "DELETE /v1/countries/${country.id}")
         return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = country, metadata = ApiGeneralRegistrationMetadataDTO(
             ApiGeneralRegistrationOperationsDTO(null, null, null))));
     }

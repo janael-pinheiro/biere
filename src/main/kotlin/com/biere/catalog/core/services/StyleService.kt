@@ -1,7 +1,7 @@
 package com.biere.catalog.core.services
 
 import com.biere.catalog.adapters.entities.StyleEntity
-import com.biere.catalog.adapters.repositories.StyleRepository
+import com.biere.catalog.adapters.output.repositories.StyleRepository
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
 import com.biere.catalog.core.exceptions.NotFoundException
