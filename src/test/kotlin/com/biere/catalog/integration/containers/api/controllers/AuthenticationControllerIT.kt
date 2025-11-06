@@ -1,7 +1,7 @@
 package com.biere.catalog.integration.containers.api.controllers
 
-import com.biere.catalog.containers.api.controllers.user.TokenRequestDTO
-import com.biere.catalog.containers.api.controllers.user.TokenResponseDTO
+import com.biere.catalog.containers.api.dtos.TokenRequestDTO
+import com.biere.catalog.containers.api.dtos.TokenResponseDTO
 import com.biere.catalog.adapters.entities.UserEntity
 import com.biere.catalog.adapters.output.repositories.UserRepository
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
@@ -45,7 +45,7 @@ class AuthenticationControllerIT(
             .expectStatus().isOk
             .expectBody(TokenResponseDTO::class.java)
             .consumeWith { response -> val tokenResponse = response.responseBody
-                assertEquals(3, tokenResponse?.token?.split(".")?.size)
+                assertEquals(3, tokenResponse?.accessToken?.split(".")?.size)
 
             }
     }

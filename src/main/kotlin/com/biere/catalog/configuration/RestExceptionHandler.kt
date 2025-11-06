@@ -2,6 +2,8 @@ package com.biere.catalog.configuration
 
 import com.biere.catalog.containers.api.dtos.ApiError
 import com.biere.catalog.core.exceptions.ConflictException
+import com.biere.catalog.core.exceptions.ExpiredTokenException
+import com.biere.catalog.core.exceptions.InvalidTokenException
 import com.biere.catalog.core.exceptions.NotAuthorizedException
 import com.biere.catalog.core.exceptions.NotFoundException
 import jakarta.servlet.http.HttpServletRequest
@@ -53,6 +55,34 @@ class RestExceptionHandler {
             path = request.servletPath
         )
         return ResponseEntity(apiError, HttpStatus.NOT_FOUND)
+    }
+
+    @ExceptionHandler(ExpiredTokenException::class)
+    fun handleExpiredTokenException(
+        ex: ExpiredTokenException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiError> {
+        val apiError = ApiError(
+            status = HttpStatus.UNAUTHORIZED.value(),
+            error = HttpStatus.UNAUTHORIZED.reasonPhrase,
+            message = ex.message,
+            path = request.servletPath
+        )
+        return ResponseEntity(apiError, HttpStatus.UNAUTHORIZED)
+    }
+
+    @ExceptionHandler(InvalidTokenException::class)
+    fun handleInvalidTokenException(
+        ex: InvalidTokenException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiError> {
+        val apiError = ApiError(
+            status = HttpStatus.UNAUTHORIZED.value(),
+            error = HttpStatus.UNAUTHORIZED.reasonPhrase,
+            message = ex.message,
+            path = request.servletPath
+        )
+        return ResponseEntity(apiError, HttpStatus.UNAUTHORIZED)
     }
 
 }

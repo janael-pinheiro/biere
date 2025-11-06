@@ -2,8 +2,10 @@ package com.biere.catalog.core.services
 
 import com.biere.catalog.adapters.entities.UserEntity
 import com.biere.catalog.adapters.output.repositories.UserRepository
-import com.biere.catalog.containers.api.controllers.user.TokenRequestDTO
-import com.biere.catalog.containers.api.controllers.user.TokenResponseDTO
+import com.biere.catalog.containers.api.dtos.TokenRequestDTO
+import com.biere.catalog.containers.api.dtos.TokenResponseDTO
+import com.biere.catalog.core.exceptions.ExpiredTokenException
+import com.biere.catalog.core.exceptions.InvalidTokenException
 import com.biere.catalog.core.exceptions.NotAuthorizedException
 import com.biere.catalog.core.models.InputUser
 import io.jsonwebtoken.Claims
@@ -20,39 +22,54 @@ import java.util.*
 @Service
 class UserService(
     @Value("\${jwt.secret}") private val secret: String,
-    @Value("\${jwt.expiration}") private val expiration: Long,
+    @Value("\${access-token.expiration}") private val accessTokenExpiration: Long,
+    @Value("\${refresh-token.expiration}") private val refreshTokenExpiration: Long,
     val userRepository: UserRepository
 ) {
     private val signingKey: Key by lazy {
         Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret))
     }
 
-    fun generateToken(loginRequest: TokenRequestDTO): TokenResponseDTO {
-        if(!isUserValid(loginRequest.email, loginRequest.password)){
+    fun generateToken(tokenRequest: TokenRequestDTO): TokenResponseDTO {
+        if(!isUserValid(tokenRequest.email, tokenRequest.password)){
             throw NotAuthorizedException("E-mail or password incorrect.")
         }
         val now = Date()
-        val expiryDate = Date(now.time + expiration)
+        val accessToken = createToken(tokenRequest.email, now.time + accessTokenExpiration, now)
+        val refreshToken = createToken(tokenRequest.email, now.time + refreshTokenExpiration, now)
+        return TokenResponseDTO(accessToken = accessToken, refreshToken = refreshToken)
+    }
 
+    fun refreshToken(refreshToken: String): TokenResponseDTO {
+        val now = Date()
+        val accessToken = createToken("", now.time + accessTokenExpiration, now)
+        val refreshToken = createToken("", now.time + refreshTokenExpiration, now)
+        return TokenResponseDTO(accessToken = accessToken, refreshToken = refreshToken)
+    }
+
+    private fun createToken(email: String, expiration: Long, issueAt: Date): String {
         val jwtToken = Jwts.builder()
-            .subject(loginRequest.email)
-            .issuedAt(now)
-            .expiration(expiryDate)
+            .subject(email)
+            .issuedAt(issueAt)
+            .expiration(Date(expiration))
             .signWith(signingKey)
             .compact()
-        return TokenResponseDTO(token = jwtToken)
+        return jwtToken
     }
 
     private fun isUserValid(email: String, password: String): Boolean {
         return userRepository.existsByEmailAndPassword(email, password)
     }
 
-  fun isTokenValid(token: String): Boolean {
-        return try {
+  fun isTokenValid(token: String) {
+        try {
             parseToken(token)
-            true
-        } catch (e: Exception) {
-            false
+        } catch (_: io.jsonwebtoken.ExpiredJwtException){
+            throw ExpiredTokenException("Expired token.")
+        } catch (_: InvalidTokenException){
+            throw InvalidTokenException("Invalid token.")
+        } catch (_: Exception) {
+            throw NotAuthorizedException("Invalid token.")
         }
     }
 
