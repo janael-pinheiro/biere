@@ -6,6 +6,7 @@ import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,6 +16,13 @@ class BreweryService(private val breweryRepository: BreweryRepository, private v
         val newBrewery = BreweryEntity(name = inputBrewery.name, country = country)
         val savedBrewery = breweryRepository.save(newBrewery)
         return BreweryResponseDTO(id = savedBrewery.id ?: 0, name = savedBrewery.name, countryName = savedBrewery.country.name)
+    }
+
+    fun getBreweries(): List<BreweryResponseDTO> {
+        return this.breweryRepository.findAll().stream().map { brewery -> BreweryResponseDTO(
+            id = brewery.id ?: 0,
+            name = brewery.name,
+            countryName = brewery.country.name) }.toList()
     }
 
     fun getSpecificBrewery(breweryId: Long): BreweryResponseDTO {

@@ -1,5 +1,6 @@
 package com.biere.catalog.containers.api.controllers.brewery
 
+import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationMetadataDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationOperationsDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
@@ -24,6 +25,12 @@ class BreweryController(private val breweryService: BreweryService) {
         val brewery = this.breweryService.register(inputBrewery)
         return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = brewery, metadata = ApiGeneralRegistrationMetadataDTO(
             ApiGeneralRegistrationOperationsDTO(null, null, null))))
+    }
+
+    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getBreweries(): ResponseEntity<ApiCollectionResponseDTO<List<BreweryResponseDTO>>>{
+        val breweries = breweryService.getBreweries()
+        return ResponseEntity.ok(ApiCollectionResponseDTO(data = breweries, page = null))
     }
 
     @GetMapping("/{breweryId}", produces = [MediaType.APPLICATION_JSON_VALUE])

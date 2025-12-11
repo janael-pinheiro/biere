@@ -26,4 +26,8 @@ class BeerService(
     fun updateBeer(beerId: Long, beerUpdate: UpdateBeerModel): OutputBeerModel {
         return beerOutputPort.updateBeer(beerId, beerUpdate)
     }
+
+    fun deleteBeer(beerId: Long) {
+        beerOutputPort.deleteBeer(beerId)
+    }
 }

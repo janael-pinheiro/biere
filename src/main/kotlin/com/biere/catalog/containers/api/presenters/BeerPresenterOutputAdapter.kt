@@ -24,7 +24,8 @@ class BeerPresenterOutputAdapter: BeerPresenterOutputPort {
             next = "/v1/beers?page=${input.metadata.next}&size=${page.pageSize}&sort=name",
             previous = "/v1/beers?page=${input.metadata.previous}&size=${page.pageSize}&sort=name",
             first = "/v1/beers?page=0&size=${page.pageSize}&sort=name",
-            last = "/v1/beers?page=${input.metadata.last}&size=${page.pageSize}&sort=name"
+            last = "/v1/beers?page=${input.metadata.last}&size=${page.pageSize}&sort=name",
+            current = input.metadata.current
         )
         val beersResponse = input.data.stream().map(BeerMapper::mapToBeerResponseDTO).toList()
         return ApiCollectionResponseDTO(data = beersResponse, page = outputPage)

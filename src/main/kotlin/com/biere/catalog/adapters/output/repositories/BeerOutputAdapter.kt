@@ -15,7 +15,7 @@ class BeerOutputAdapter(
     override fun getBeers(page: PageRequest): PaginatedResult<List<OutputBeerModel>> {
         val beers = beerRepository.findAll(org.springframework.data.domain.PageRequest.of(page.number, page.size, Sort.by(page.sort)))
         val outputBeers: List<OutputBeerModel> = beers.stream().map( BeerEntityMapper::mapToOutputBeer).toList()
-        val outputPage = PageMetadata(totalElements = beers.totalElements, totalPages = beers.totalPages, null, null, null ,null)
+        val outputPage = PageMetadata(totalElements = beers.totalElements, totalPages = beers.totalPages, null, null, null ,null, page.number)
         return PaginatedResult(outputBeers, outputPage)
     }
 
@@ -45,5 +45,9 @@ class BeerOutputAdapter(
         beer.year = updatedBeer.year ?: beer.year
 
         return BeerEntityMapper.mapToOutputBeer(beerRepository.save(beer))
+    }
+
+    override fun deleteBeer(beerId: Long) {
+        beerRepository.deleteById(beerId)
     }
 }

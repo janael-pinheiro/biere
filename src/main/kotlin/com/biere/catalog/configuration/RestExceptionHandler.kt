@@ -7,10 +7,12 @@ import com.biere.catalog.core.exceptions.InvalidTokenException
 import com.biere.catalog.core.exceptions.NotAuthorizedException
 import com.biere.catalog.core.exceptions.NotFoundException
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import java.net.URI
 
 @ControllerAdvice
 class RestExceptionHandler {
@@ -26,7 +28,10 @@ class RestExceptionHandler {
             message = ex.message,
             path = request.servletPath
         )
-        return ResponseEntity(apiError, HttpStatus.UNAUTHORIZED)
+        val headers = HttpHeaders();
+        val uriLocation: URI = URI.create("/login")
+        headers.location = uriLocation
+        return ResponseEntity(apiError, headers, HttpStatus.UNAUTHORIZED)
     }
 
     @ExceptionHandler(ConflictException::class)

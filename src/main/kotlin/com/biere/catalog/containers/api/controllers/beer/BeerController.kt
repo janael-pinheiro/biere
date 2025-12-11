@@ -59,4 +59,10 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         return ResponseEntity.ok().body(BeerMapper.mapToBeerResponseDTO(beer))
     }
 
+    @DeleteMapping("/{beerId}")
+    fun deleteBeer(@PathVariable beerId: Long): ResponseEntity<Void> {
+        beerService.deleteBeer(beerId)
+        return ResponseEntity.noContent().build()
+    }
+
 }

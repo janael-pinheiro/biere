@@ -8,5 +8,6 @@ data class PageDTO(
     val first: String?,
     val last: String?,
     val next: String?,
-    val previous: String?) {
+    val previous: String?,
+    val current: Int?) {
 }

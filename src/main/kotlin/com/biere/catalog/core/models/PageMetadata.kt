@@ -6,4 +6,5 @@ data class PageMetadata(
     val first: String?,
     val last: String?,
     val next: String?,
-    val previous: String?)
+    val previous: String?,
+    val current: Int?)
