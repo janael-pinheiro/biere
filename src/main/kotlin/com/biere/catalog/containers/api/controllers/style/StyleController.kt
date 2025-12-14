@@ -6,12 +6,14 @@ import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationOperationsDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
+import com.biere.catalog.containers.api.dtos.StyleUpdateRequestDTO
 import com.biere.catalog.core.services.StyleService
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -37,6 +39,12 @@ class StyleController(private val styleService: StyleService) {
     @GetMapping("{styleId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificStyle(@PathVariable styleId: Long): ResponseEntity<StyleResponseDTO> {
         val style = styleService.getSpecificStyle(styleId)
+        return ResponseEntity.ok().body(style)
+    }
+
+    @PutMapping("{styleId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun updateStyle(@PathVariable styleId: Long, @RequestBody style: StyleUpdateRequestDTO): ResponseEntity<StyleResponseDTO> {
+        val style = styleService.updateStyle(styleId, style)
         return ResponseEntity.ok().body(style)
     }
 }

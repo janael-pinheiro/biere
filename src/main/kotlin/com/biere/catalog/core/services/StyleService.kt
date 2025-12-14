@@ -4,6 +4,7 @@ import com.biere.catalog.adapters.entities.StyleEntity
 import com.biere.catalog.adapters.output.repositories.StyleRepository
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
+import com.biere.catalog.containers.api.dtos.StyleUpdateRequestDTO
 import com.biere.catalog.core.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 import java.util.stream.Collectors
@@ -27,5 +28,12 @@ class StyleService(private val styleRepository: StyleRepository) {
         }
         val style = styleOptional.get()
         return StyleResponseDTO(id = style.id ?: 0, name = style.name)
+    }
+
+    fun updateStyle(styleId: Long, style: StyleUpdateRequestDTO): StyleResponseDTO {
+        val styleEntity = styleRepository.findById(styleId).orElseThrow { NotFoundException("Style not found.") }
+        styleEntity.name = style.name
+        styleRepository.save(styleEntity)
+        return StyleResponseDTO(id = styleEntity.id!!, name = styleEntity.name)
     }
 }

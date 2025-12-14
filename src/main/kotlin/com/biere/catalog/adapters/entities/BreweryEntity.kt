@@ -11,4 +11,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "breweries")
-data class BreweryEntity(@Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null, val name: String, @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "country_id") var country: CountryEntity)
+data class BreweryEntity(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
+    var name: String,
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "country_id") var country: CountryEntity)

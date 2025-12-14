@@ -8,5 +8,5 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "styles")
-class StyleEntity(@Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null, val name: String) {
+class StyleEntity(@Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null, var name: String) {
 }

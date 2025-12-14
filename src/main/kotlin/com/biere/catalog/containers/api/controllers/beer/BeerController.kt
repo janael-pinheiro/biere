@@ -33,7 +33,7 @@ class BeerController(private val beerService: BeerService, private val beerPrese
     }
 
     @GetMapping(produces = ["text/csv"])
-    fun getBeersCsv(@PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable): ResponseEntity<ByteArrayResource>{
+    fun getBeersCsv(@PageableDefault(page = 0, size = 100, sort = ["name"]) page: Pageable): ResponseEntity<ByteArrayResource>{
         val beers = this.beerService.getBeers(PageRequest(number = page.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
         return ResponseEntity
             .ok()

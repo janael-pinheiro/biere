@@ -6,6 +6,7 @@ import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationOperationsDTO
 import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
 import com.biere.catalog.containers.api.dtos.CountryResponseDTO
+import com.biere.catalog.containers.api.dtos.CountryUpdateRequestDTO
 import com.biere.catalog.containers.api.dtos.MultipleCountriesResponseDTO
 import com.biere.catalog.core.services.CountryService
 import org.springframework.http.MediaType
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -49,5 +51,11 @@ class CountryController(private val countryService: CountryService) {
     fun deleteCountry(@PathVariable countryId: Long): ResponseEntity<String> {
         this.countryService.deleteCountry(countryId)
         return ResponseEntity.noContent().build()
+    }
+
+    @PutMapping("{countryId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun updateCountry(@PathVariable countryId: Long, @RequestBody countryUpdateRequestDTO: CountryUpdateRequestDTO): ResponseEntity<CountryResponseDTO> {
+        val country = this.countryService.updateCountry(countryId, countryUpdateRequestDTO)
+        return ResponseEntity.ok(country)
     }
 }

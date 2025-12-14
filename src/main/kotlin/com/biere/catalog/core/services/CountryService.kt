@@ -6,6 +6,7 @@ import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.output.repositories.CountryRepository
+import com.biere.catalog.containers.api.dtos.CountryUpdateRequestDTO
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
@@ -39,5 +40,14 @@ class CountryService(private val countryRepository: CountryRepository) {
 
     fun deleteCountry(countryId: Long) {
         this.countryRepository.deleteById(countryId)
+    }
+
+    fun updateCountry(
+        countryId: Long,
+        countryUpdateDTO: CountryUpdateRequestDTO): CountryResponseDTO {
+        val country = this.countryRepository.findById(countryId).orElseThrow { NotFoundException("Country not found") }
+        country.name = countryUpdateDTO.name
+        this.countryRepository.save(country)
+        return CountryResponseDTO(id = country.id!!, name = country.name)
     }
 }

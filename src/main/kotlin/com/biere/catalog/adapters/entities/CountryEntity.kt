@@ -15,5 +15,8 @@ import java.time.ZonedDateTime
 @Getter
 @Setter
 @Builder
-class CountryEntity(@Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null, val name: String, private val createdAt: ZonedDateTime) {
+class CountryEntity(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
+    var name: String,
+    private val createdAt: ZonedDateTime) {
 }
