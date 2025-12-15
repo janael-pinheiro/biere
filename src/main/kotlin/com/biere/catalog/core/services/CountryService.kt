@@ -14,15 +14,13 @@ import java.time.ZonedDateTime
 @Service
 class CountryService(private val countryRepository: CountryRepository) {
     fun registerCountry(countryRegistrationDTO: CountryRegistrationDTO): CountryResponseDTO {
+        if (countryRepository.existsByName(countryRegistrationDTO.name)) {
+            throw ConflictException("The name ${countryRegistrationDTO.name} already exists.")
+        }
         val now: ZonedDateTime = ZonedDateTime.now();
         val country = CountryEntity(name = countryRegistrationDTO.name, createdAt = now)
         var savedCountry: CountryEntity? = null
-        try{
-            savedCountry = countryRepository.save(country)
-        } catch (e: DataIntegrityViolationException){
-            if(e.message?.contains("duplicate key value violates unique constraint") == true)
-                throw ConflictException(message = "Country already registered.")
-        }
+        savedCountry = countryRepository.save(country)
         return CountryResponseDTO(id = savedCountry?.id, name = savedCountry?.name)
     }
 

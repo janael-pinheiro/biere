@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface StyleRepository: JpaRepository<StyleEntity, Long> {
+    fun existsByName(name: String): Boolean
 }

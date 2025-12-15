@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface BreweryRepository: JpaRepository<BreweryEntity, Long> {
+    fun existsByName(name: String): Boolean
 }

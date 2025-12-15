@@ -2,6 +2,7 @@ package com.biere.catalog.adapters.output.repositories
 
 import com.biere.catalog.adapters.entities.BeerEntityMapper
 import com.biere.catalog.core.boundaries.output.BeerOutputPort
+import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.core.models.*
 import org.springframework.data.domain.Sort
@@ -21,6 +22,9 @@ class BeerOutputAdapter(
     }
 
     override fun saveBeer(inputBeer: InputBeerModel): OutputBeerModel {
+        if (beerRepository.existsByName(inputBeer.name)) {
+            throw ConflictException("Beer with name ${inputBeer.name} already exists.")
+        }
         val brewery = breweryRepository.findById(inputBeer.breweryId).get()
         val style = styleRepository.findById(inputBeer.styleId).get()
         val beer = BeerEntityMapper.mapToEntity(inputBeer, brewery, style)

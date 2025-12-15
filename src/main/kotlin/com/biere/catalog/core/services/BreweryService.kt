@@ -7,12 +7,16 @@ import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.containers.api.dtos.BreweryUpdateRequestDTO
+import com.biere.catalog.core.exceptions.ConflictException
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
 class BreweryService(private val breweryRepository: BreweryRepository, private val countryRepository: CountryRepository) {
     fun register(inputBrewery: BreweryRegistrationDTO): BreweryResponseDTO {
+        if (breweryRepository.existsByName(inputBrewery.name)){
+            throw ConflictException("The name ${inputBrewery.name} already exists.")
+        }
         val country = countryRepository.findById(inputBrewery.countryId).get()
         val newBrewery = BreweryEntity(name = inputBrewery.name, country = country)
         val savedBrewery = breweryRepository.save(newBrewery)

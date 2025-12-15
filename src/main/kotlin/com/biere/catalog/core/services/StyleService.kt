@@ -12,6 +12,9 @@ import java.util.stream.Collectors
 @Service
 class StyleService(private val styleRepository: StyleRepository) {
     fun register(style: StyleRegistrationDTO): StyleResponseDTO{
+        if (styleRepository.existsByName(style.name)){
+            throw NotFoundException("The name ${style.name} already exists.")
+        }
         val savedStyle = styleRepository.save(StyleEntity(name = style.name))
         return StyleResponseDTO(id = savedStyle.id ?: 0, name = savedStyle.name)
     }

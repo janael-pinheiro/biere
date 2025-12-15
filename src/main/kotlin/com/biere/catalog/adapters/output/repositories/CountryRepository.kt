@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CountryRepository: JpaRepository<CountryEntity, Long> {
+    fun existsByName(name: String): Boolean
 }
