@@ -1,14 +1,13 @@
 package com.biere.catalog.core.services
 
-import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
-import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
-import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
+import com.biere.catalog.containers.api.dtos.BreweryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.containers.api.dtos.BreweryUpdateRequestDTO
 import com.biere.catalog.core.exceptions.ConflictException
-import org.springframework.http.ResponseEntity
+import com.biere.catalog.core.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 
 @Service

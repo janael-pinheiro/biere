@@ -1,11 +1,7 @@
 package com.biere.catalog.configuration
 
 import com.biere.catalog.containers.api.dtos.ApiError
-import com.biere.catalog.core.exceptions.ConflictException
-import com.biere.catalog.core.exceptions.ExpiredTokenException
-import com.biere.catalog.core.exceptions.InvalidTokenException
-import com.biere.catalog.core.exceptions.NotAuthorizedException
-import com.biere.catalog.core.exceptions.NotFoundException
+import com.biere.catalog.core.exceptions.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus

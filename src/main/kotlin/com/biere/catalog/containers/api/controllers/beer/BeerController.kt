@@ -2,7 +2,6 @@ package com.biere.catalog.containers.api.controllers.beer
 
 import com.biere.catalog.adapters.output.repositories.mappers.BeerMapper
 import com.biere.catalog.containers.api.dtos.*
-import com.biere.catalog.containers.api.presenters.BeerPresenterOutputAdapter
 import com.biere.catalog.core.boundaries.output.BeerPresenterOutputPort
 import com.biere.catalog.core.models.PageRequest
 import com.biere.catalog.core.models.UpdateBeerModel

@@ -1,7 +1,6 @@
 package com.biere.catalog.core.models
 
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 data class User(

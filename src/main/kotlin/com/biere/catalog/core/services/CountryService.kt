@@ -1,13 +1,12 @@
 package com.biere.catalog.core.services
 
-import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
-import com.biere.catalog.containers.api.dtos.CountryResponseDTO
-import com.biere.catalog.core.exceptions.ConflictException
-import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.output.repositories.CountryRepository
+import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.CountryResponseDTO
 import com.biere.catalog.containers.api.dtos.CountryUpdateRequestDTO
-import org.springframework.dao.DataIntegrityViolationException
+import com.biere.catalog.core.exceptions.ConflictException
+import com.biere.catalog.core.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 

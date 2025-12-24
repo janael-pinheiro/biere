@@ -1,4 +1,6 @@
 package com.biere.catalog.containers.api.dtos
 
-class ApiCollectionResponseDTO<T>(val data: T, val page: PageDTO?) {
+import org.springframework.hateoas.RepresentationModel
+
+class ApiCollectionResponseDTO<T>(val data: T, val page: PageDTO?): RepresentationModel<ApiCollectionResponseDTO<T>>() {
 }

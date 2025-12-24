@@ -1,11 +1,7 @@
 package com.biere.catalog.containers.api.presenters
 
 import com.biere.catalog.adapters.output.repositories.mappers.BeerMapper
-import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
-import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationMetadataDTOFactory
-import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
-import com.biere.catalog.containers.api.dtos.BeerResponseDTO
-import com.biere.catalog.containers.api.dtos.PageDTO
+import com.biere.catalog.containers.api.dtos.*
 import com.biere.catalog.core.boundaries.output.BeerPresenterOutputPort
 import com.biere.catalog.core.models.OutputBeerModel
 import com.biere.catalog.core.models.PaginatedResult
@@ -47,7 +43,6 @@ class BeerPresenterOutputAdapter: BeerPresenterOutputPort {
         val self = ApiGeneralRegistrationMetadataDTOFactory.createAction("/v1/beers/${outputBeer.id}", "GET", "application/json")
         val update = ApiGeneralRegistrationMetadataDTOFactory.createAction("/v1/beers/${outputBeer.id}", "PATCH", "application/json")
         val operations = ApiGeneralRegistrationMetadataDTOFactory.createOperations(self = self, update = update, delete = null)
-        val metadata = ApiGeneralRegistrationMetadataDTOFactory.create(links = operations)
-        return ApiGeneralRegistrationResponseDTO(data = outputBeer, metadata = metadata)
+        return ApiGeneralRegistrationResponseDTO(data = outputBeer)
     }
 }

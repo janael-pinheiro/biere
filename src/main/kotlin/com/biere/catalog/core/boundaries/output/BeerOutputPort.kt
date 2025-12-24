@@ -1,10 +1,6 @@
 package com.biere.catalog.core.boundaries.output
 
-import com.biere.catalog.core.models.InputBeerModel
-import com.biere.catalog.core.models.OutputBeerModel
-import com.biere.catalog.core.models.PageRequest
-import com.biere.catalog.core.models.PaginatedResult
-import com.biere.catalog.core.models.UpdateBeerModel
+import com.biere.catalog.core.models.*
 
 interface BeerOutputPort {
     fun getBeers(page: PageRequest): PaginatedResult<List<OutputBeerModel>>

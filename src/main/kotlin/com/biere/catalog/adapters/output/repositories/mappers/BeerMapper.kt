@@ -1,6 +1,5 @@
 package com.biere.catalog.adapters.output.repositories.mappers
 
-import com.biere.catalog.adapters.entities.BeerEntity
 import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
 import com.biere.catalog.containers.api.dtos.BeerResponseDTO
 import com.biere.catalog.core.models.InputBeerModel

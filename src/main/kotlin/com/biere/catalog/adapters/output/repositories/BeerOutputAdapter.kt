@@ -6,7 +6,7 @@ import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.core.models.*
 import org.springframework.data.domain.Sort
-import java.util.Objects
+import java.util.*
 
 class BeerOutputAdapter(
     private val beerRepository: BeerRepository,

@@ -1,4 +1,6 @@
 package com.biere.catalog.containers.api.dtos
 
-class ApiGeneralRegistrationResponseDTO<T>(val data: T, val metadata: ApiGeneralRegistrationMetadataDTO) {
+import org.springframework.hateoas.RepresentationModel
+
+class ApiGeneralRegistrationResponseDTO<T>(val data: T): RepresentationModel<ApiGeneralRegistrationResponseDTO<T>>() {
 }
