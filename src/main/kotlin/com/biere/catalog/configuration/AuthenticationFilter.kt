@@ -51,6 +51,11 @@ class AuthenticationFilter(
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return request.servletPath in listOf("/v1/users/login", "/v1/users/refresh-token", "/error")
+        val path = request.servletPath
+        return path == "/v1/users/login" ||
+                path == "/v1/users/refresh-token" ||
+                path == "/error" ||
+                path.contains("/v3/api-docs") ||
+                path.contains("/swagger-ui")
     }
 }

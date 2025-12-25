@@ -54,7 +54,7 @@ class BreweryControllerIT(
             .expectStatus().isCreated
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val brewery = response.responseBody
-                assertEquals(1, brewery?.links?.size)
+                assertEquals(1, brewery?.links?.toList()?.size)
             }
     }
 
@@ -71,7 +71,7 @@ class BreweryControllerIT(
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val breweryResponse = response.responseBody
                 breweryUrl =
-                    breweryResponse?.links?.stream()?.filter { brewery -> brewery.contains("GET") }?.toList()?.get(0).toString().split(" ")[1]
+                    breweryResponse?.links?.filter { link -> link.toString().contains("GET") }?.get(0).toString().split(" ")[1]
             }
 
         webTestClient

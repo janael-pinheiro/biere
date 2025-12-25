@@ -49,7 +49,7 @@ class BeerControllerIT(
         val savedCountry = this.countryRepository.save(country)
         brewery = this.breweryRepository.save(BreweryEntity(name = "Heineken", country = savedCountry))
         style = this.styleRepository.save(StyleEntity(name = "lager"))
-        newBeer = BeerRegistrationDTO(name = "Heineken", countryId = savedCountry.id ?: 0, alcoholContent = 4.5F, breweryId = brewery.id ?: 0, style.id ?: 0)
+        newBeer = BeerRegistrationDTO(name = "Heineken", countryId = savedCountry.id ?: 0, alcoholContent = 4.5F, breweryId = brewery.id ?: 0, styleId = style.id ?: 0, year = 2024L)
     }
 
     @AfterEach
@@ -69,7 +69,7 @@ class BeerControllerIT(
             .expectStatus().isCreated
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val beer = response.responseBody
-                assertEquals(2, beer?.links?.size)
+                assertEquals(2, beer?.links?.toList()?.size)
             }
     }
 
@@ -86,7 +86,7 @@ class BeerControllerIT(
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val beers = response.responseBody
                 beerUrl =
-                    beers?.links?.stream()?.filter { beer -> beer.contains("GET") }?.toList()?.get(0).toString().split(" ")[1]
+                    beers?.links?.filter { link -> link.toString().contains("GET") }?.get(0).toString().split(" ")[1]
             }
 
         webTestClient
@@ -150,13 +150,13 @@ class BeerControllerIT(
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val beers = response.responseBody
                 beerUrl =
-                    beers?.links?.stream()?.filter({ beer -> beer.contains("PATCH")})?.toList()?.get(0).toString().split(" ")[1]
+                    beers?.links?.filter { link -> link.toString().contains("PATCH") }?.get(0).toString().split(" ")[1]
             }
 
         webTestClient
             .patch()
             .uri(beerUrl)
-            .bodyValue(BeerUpdateRequestDTO(countryId = savedCountry.id ?: 0))
+            .bodyValue(BeerUpdateRequestDTO(name = null, alcoholContent = null, breweryId = null, styleId = null, year = 2025L))
             .exchange()
             .expectStatus().isOk
 
@@ -177,11 +177,13 @@ class BeerControllerIT(
             name = "Heineken",
             alcoholContent = 4.6F,
             brewery = this.brewery,
-            style = this.style))
+            style = this.style,
+            year = 2024L))
         this.beerRepository.save(BeerEntity(
             name = "Amstel",
             alcoholContent = 4.6F,
             brewery = this.brewery,
-            style = this.style))
+            style = this.style,
+            year = 2024L))
     }
 }

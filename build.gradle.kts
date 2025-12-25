@@ -1,10 +1,11 @@
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
-	id("org.springframework.boot") version "3.5.6"
+	id("org.springframework.boot") version "3.4.1"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.flywaydb.flyway") version "9.22.1"
 	kotlin("plugin.jpa") version "1.9.25"
+	id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 }
 
 group = "com.biere"
@@ -27,7 +28,8 @@ dependencies {
 	// SpringBoot
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.5.6")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-hateoas")
 
 	// Kotlin/Jackson
@@ -58,6 +60,8 @@ dependencies {
 	testImplementation("org.postgresql:postgresql:${postgresqlVersion}")
 	testImplementation("org.testcontainers:postgresql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	// OpenAPI
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 }
 
 allOpen {
@@ -81,4 +85,11 @@ flyway {
 	user = "admin"
 	password = "password"
 	locations = arrayOf("filesystem:src/main/resources/db/migration")
+}
+
+openApi {
+	apiDocsUrl.set("http://localhost:8080/v3/api-docs")
+	outputDir.set(layout.buildDirectory.dir("docs"))
+	outputFileName.set("openapi.yaml")
+	waitTimeInSeconds.set(60)
 }

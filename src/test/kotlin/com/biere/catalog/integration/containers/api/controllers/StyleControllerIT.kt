@@ -47,7 +47,7 @@ class StyleControllerIT(
             .expectStatus().isCreated
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val style = response.responseBody
-                assertEquals(1, style?.links?.size)
+                assertEquals(1, style?.links?.toList()?.size)
             }
     }
 
@@ -64,7 +64,7 @@ class StyleControllerIT(
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val styleResponse = response.responseBody
                 styleUrl =
-                    styleResponse?.links?.stream()?.filter { style -> style.contains("GET") }?.toList()?.get(0).toString().split(" ")[1]
+                    styleResponse?.links?.filter { link -> link.toString().contains("GET") }?.get(0).toString().split(" ")[1]
             }
 
         webTestClient

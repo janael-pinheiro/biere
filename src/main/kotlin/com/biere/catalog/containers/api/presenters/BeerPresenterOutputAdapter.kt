@@ -40,9 +40,7 @@ class BeerPresenterOutputAdapter: BeerPresenterOutputPort {
 
     override fun prepareRegistrationResponse(input: OutputBeerModel): ApiGeneralRegistrationResponseDTO<BeerResponseDTO> {
         val outputBeer = BeerMapper.mapToBeerResponseDTO(input)
-        val self = ApiGeneralRegistrationMetadataDTOFactory.createAction("/v1/beers/${outputBeer.id}", "GET", "application/json")
-        val update = ApiGeneralRegistrationMetadataDTOFactory.createAction("/v1/beers/${outputBeer.id}", "PATCH", "application/json")
-        val operations = ApiGeneralRegistrationMetadataDTOFactory.createOperations(self = self, update = update, delete = null)
+
         return ApiGeneralRegistrationResponseDTO(data = outputBeer)
     }
 }

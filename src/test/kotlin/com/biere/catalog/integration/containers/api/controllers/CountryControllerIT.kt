@@ -52,7 +52,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .expectStatus().isCreated
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val country = response.responseBody
-                assertEquals(2, country?.links?.size)
+                assertEquals(2, country?.links?.toList()?.size)
             }
 
         webTestClient
@@ -80,7 +80,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
                 countryUrl =
-                    countries?.links?.stream()?.filter{ country -> country.contains("GET")}?.toList()?.get(0).toString().split(" ")[1]
+                    countries?.links?.filter{ link -> link.toString().contains("GET")}?.get(0).toString().split(" ")[1]
             }
 
         webTestClient
@@ -107,7 +107,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
                 countryUrl =
-                    countries?.links?.stream()?.filter{ country -> country.contains("DELETE")}?.toList()?.get(0).toString().split(" ")[1]
+                    countries?.links?.filter{ link -> link.toString().contains("DELETE")}?.get(0).toString().split(" ")[1]
             }
 
         webTestClient
