@@ -29,7 +29,7 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun register(@Validated @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<BeerResponseDTO>> {
+    fun register(@Validated @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
         val beer = this.beerService.register(BeerMapper.mapToInputBeer(beerRegistrationDTO))
         val response = beerPresenter.prepareRegistrationResponse(beer)
         return ResponseEntity.created(URI("")).body(response)

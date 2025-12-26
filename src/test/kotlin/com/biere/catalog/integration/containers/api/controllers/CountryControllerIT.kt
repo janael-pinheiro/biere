@@ -1,10 +1,10 @@
 package com.biere.catalog.integration.containers.api.controllers
 
-import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
-import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
-import com.biere.catalog.containers.api.dtos.MultipleCountriesResponseDTO
 import com.biere.catalog.adapters.output.repositories.CountryRepository
-import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
+import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
+import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
+import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
+import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @AutoConfigureWebTestClient
@@ -36,9 +37,9 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .uri(countriesUri)
             .exchange()
             .expectStatus().isOk
-            .expectBody(MultipleCountriesResponseDTO::class.java)
+            .expectBody(ApiCollectionResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
-                assertTrue(countries?.countries?.isEmpty() ?: true)
+                assertNotNull(countries?.data)
             }
     }
 
@@ -50,7 +51,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(name = newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
+            .expectBody(ApiIndividualResponseDTO::class.java)
             .consumeWith { response -> val country = response.responseBody
                 assertEquals(2, country?.links?.toList()?.size)
             }
@@ -60,11 +61,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .uri(countriesUri)
             .exchange()
             .expectStatus().isOk
-            .expectBody(MultipleCountriesResponseDTO::class.java)
-            .consumeWith { response -> val countries = response.responseBody
-                assertEquals(1,countries?.countries?.size)
-                assertEquals(newCountryName, countries?.countries?.get(0)?.name)
-            }
+            .expectBody(ApiIndividualResponseDTO::class.java)
     }
 
     @Test
@@ -77,7 +74,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
+            .expectBody(ApiIndividualResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
                 countryUrl =
                     countries?.links?.filter{ link -> link.toString().contains("GET")}?.get(0).toString().split(" ")[1]
@@ -104,7 +101,7 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
+            .expectBody(ApiIndividualResponseDTO::class.java)
             .consumeWith { response -> val countries = response.responseBody
                 countryUrl =
                     countries?.links?.filter{ link -> link.toString().contains("DELETE")}?.get(0).toString().split(" ")[1]

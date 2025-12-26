@@ -21,9 +21,9 @@ class BreweryController(private val breweryService: BreweryService) {
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun register(@RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<BreweryResponseDTO>>{
+    fun register(@RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
         val brewery = this.breweryService.register(inputBrewery)
-        return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = brewery))
+        return ResponseEntity.created(URI("")).body(ApiIndividualResponseDTO(data = brewery))
     }
 
     @Operation(summary = "Get all breweries", description = "Retrieves a list of all breweries.")

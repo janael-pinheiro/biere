@@ -7,12 +7,13 @@ import com.biere.catalog.containers.api.dtos.CountryResponseDTO
 import com.biere.catalog.containers.api.dtos.CountryUpdateRequestDTO
 import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotFoundException
+import com.biere.catalog.core.models.CountryModel
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 
 @Service
 class CountryService(private val countryRepository: CountryRepository) {
-    fun registerCountry(countryRegistrationDTO: CountryRegistrationDTO): CountryResponseDTO {
+    fun registerCountry(countryRegistrationDTO: CountryRegistrationDTO): CountryModel {
         if (countryRepository.existsByName(countryRegistrationDTO.name)) {
             throw ConflictException("The name ${countryRegistrationDTO.name} already exists.")
         }
@@ -20,19 +21,19 @@ class CountryService(private val countryRepository: CountryRepository) {
         val country = CountryEntity(name = countryRegistrationDTO.name, createdAt = now)
         var savedCountry: CountryEntity? = null
         savedCountry = countryRepository.save(country)
-        return CountryResponseDTO(id = savedCountry?.id, name = savedCountry?.name)
+        return CountryModel(id = savedCountry.id!!, name = savedCountry.name)
     }
 
-    fun getCountries(): List<CountryResponseDTO> {
-        return this.countryRepository.findAll().stream().map { country -> CountryResponseDTO(id = country.id, name = country.name) }.toList()
+    fun getCountries(): List<CountryModel> {
+        return this.countryRepository.findAll().stream().map { country -> CountryModel(id = country.id!!, name = country.name) }.toList()
     }
 
-    fun getSpecificCountry(countryId: Long): CountryResponseDTO{
+    fun getSpecificCountry(countryId: Long): CountryModel{
         val country = this.countryRepository.findById(countryId)
         if(country.isEmpty) {
             throw NotFoundException("Country not found.")
         }
-        return CountryResponseDTO(id = country.get().id, name = country.get().name)
+        return CountryModel(id = country.get().id!!, name = country.get().name)
     }
 
     fun deleteCountry(countryId: Long) {
@@ -41,10 +42,10 @@ class CountryService(private val countryRepository: CountryRepository) {
 
     fun updateCountry(
         countryId: Long,
-        countryUpdateDTO: CountryUpdateRequestDTO): CountryResponseDTO {
+        countryUpdateDTO: CountryUpdateRequestDTO): CountryModel {
         val country = this.countryRepository.findById(countryId).orElseThrow { NotFoundException("Country not found") }
         country.name = countryUpdateDTO.name
         this.countryRepository.save(country)
-        return CountryResponseDTO(id = country.id!!, name = country.name)
+        return CountryModel(id = country.id!!, name = country.name)
     }
 }

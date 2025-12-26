@@ -2,7 +2,6 @@ package com.biere.catalog.integration.containers.api.controllers
 
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import com.biere.catalog.adapters.output.repositories.StyleRepository
-import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
 import org.junit.jupiter.api.AfterEach

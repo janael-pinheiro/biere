@@ -13,7 +13,6 @@ import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.adapters.output.repositories.StyleRepository
 import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
-import com.biere.catalog.containers.api.dtos.ApiGeneralRegistrationResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

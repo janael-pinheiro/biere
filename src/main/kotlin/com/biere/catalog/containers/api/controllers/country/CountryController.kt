@@ -1,32 +1,32 @@
 package com.biere.catalog.containers.api.controllers.country
 
 import com.biere.catalog.containers.api.dtos.*
+import com.biere.catalog.containers.api.presenters.CountryPresenterAdapter
 import com.biere.catalog.core.services.CountryService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.net.URI
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 
 @RestController
 @RequestMapping("/v1/countries")
 @Tag(name = "Countries", description = "Country management APIs")
-class CountryController(private val countryService: CountryService) {
+class CountryController(private val countryService: CountryService, private val countryPresenter: CountryPresenterAdapter = CountryPresenterAdapter()) {
     @Operation(summary = "Register a new country", description = "Creates a new country.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Country created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun registerCountry(@RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiGeneralRegistrationResponseDTO<CountryResponseDTO>> {
+    fun registerCountry(@RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.registerCountry(countryRegistrationDTO)
-//        val links = listOf(
-//            "GET /v1/countries/${country.id}",
-//            "DELETE /v1/countries/${country.id}")
-        return ResponseEntity.created(URI("")).body(ApiGeneralRegistrationResponseDTO(data = country));
+        return ResponseEntity
+            .created(URI("/v1/countries/${country.id}"))
+            .body(countryPresenter.prepareCreateCountry(country));
     }
 
     @Operation(summary = "Get all countries", description = "Retrieves a list of all countries.")
@@ -36,7 +36,7 @@ class CountryController(private val countryService: CountryService) {
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCountries(): ResponseEntity<ApiCollectionResponseDTO<List<CountryResponseDTO>>>{
         val countries = this.countryService.getCountries()
-        return ResponseEntity.ok(ApiCollectionResponseDTO(data = countries, page = null))
+        return ResponseEntity.ok(this.countryPresenter.prepareGetAllCountries(countries))
     }
 
     @Operation(summary = "Get a specific country", description = "Retrieves details of a specific country by ID.")
@@ -45,9 +45,9 @@ class CountryController(private val countryService: CountryService) {
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @GetMapping("/{countryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getSpecificCountry(@PathVariable countryId: Long): ResponseEntity<CountryResponseDTO> {
+    fun getSpecificCountry(@PathVariable countryId: Long): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val countryResponse = this.countryService.getSpecificCountry(countryId)
-        return ResponseEntity.ok(countryResponse)
+        return ResponseEntity.ok(this.countryPresenter.prepareGetStyle(countryResponse))
     }
 
     @Operation(summary = "Delete a country", description = "Deletes a country by ID.")
@@ -67,8 +67,8 @@ class CountryController(private val countryService: CountryService) {
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @PutMapping("{countryId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateCountry(@PathVariable countryId: Long, @RequestBody countryUpdateRequestDTO: CountryUpdateRequestDTO): ResponseEntity<CountryResponseDTO> {
+    fun updateCountry(@PathVariable countryId: Long, @RequestBody countryUpdateRequestDTO: CountryUpdateRequestDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.updateCountry(countryId, countryUpdateRequestDTO)
-        return ResponseEntity.ok(country)
+        return ResponseEntity.ok(this.countryPresenter.prepareUpdateCountry(country))
     }
 }

@@ -38,9 +38,8 @@ class BeerPresenterOutputAdapter: BeerPresenterOutputPort {
         return ByteArrayResource(writer.toString().toByteArray(StandardCharsets.UTF_8))
     }
 
-    override fun prepareRegistrationResponse(input: OutputBeerModel): ApiGeneralRegistrationResponseDTO<BeerResponseDTO> {
+    override fun prepareRegistrationResponse(input: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {
         val outputBeer = BeerMapper.mapToBeerResponseDTO(input)
-
-        return ApiGeneralRegistrationResponseDTO(data = outputBeer)
+        return ApiIndividualResponseDTO(data = outputBeer)
     }
 }
