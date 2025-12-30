@@ -8,8 +8,10 @@ import com.biere.catalog.core.models.PaginatedResult
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.data.domain.Pageable
 
-interface BeerPresenterOutputPort {
-    fun prepareJsonData(page: Pageable, input: PaginatedResult<List<OutputBeerModel>>): ApiCollectionResponseDTO<List<BeerResponseDTO>>
+interface BeerPresenterPort {
+    fun prepareJsonData(page: Pageable?, input: PaginatedResult<List<OutputBeerModel>>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>
     fun prepareCsvData(beers: PaginatedResult<List<OutputBeerModel>>): ByteArrayResource
     fun prepareRegistrationResponse(input: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
+    fun prepareGetBeer(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
+    fun prepareUpdateBrewery(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
 }

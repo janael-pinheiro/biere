@@ -22,7 +22,7 @@ class CountryPresenterAdapter(private val countryMapper: CountryMapper = Country
         return outputCountry
     }
 
-    fun prepareGetStyle(countryModel: CountryModel): ApiIndividualResponseDTO<CountryResponseDTO> {
+    fun prepareGetCountry(countryModel: CountryModel): ApiIndividualResponseDTO<CountryResponseDTO> {
         val countryDto = ApiIndividualResponseDTO(data = countryMapper.toCountryDto(countryModel))
         this.addSelfLink(countryDto)
         this.addUpdateLink(countryDto)
@@ -31,7 +31,7 @@ class CountryPresenterAdapter(private val countryMapper: CountryMapper = Country
     }
 
     fun prepareUpdateCountry(countryModel: CountryModel): ApiIndividualResponseDTO<CountryResponseDTO> {
-        return this.prepareGetStyle(countryModel)
+        return this.prepareGetCountry(countryModel)
     }
 
     fun prepareGetAllCountries(countries: List<CountryModel>): ApiCollectionResponseDTO<List<CountryResponseDTO>> {

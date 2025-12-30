@@ -2,7 +2,7 @@ package com.biere.catalog.containers.api.controllers.beer
 
 import com.biere.catalog.adapters.output.repositories.mappers.BeerMapper
 import com.biere.catalog.containers.api.dtos.*
-import com.biere.catalog.core.boundaries.output.BeerPresenterOutputPort
+import com.biere.catalog.core.boundaries.output.BeerPresenterPort
 import com.biere.catalog.core.models.PageRequest
 import com.biere.catalog.core.models.UpdateBeerModel
 import com.biere.catalog.core.services.BeerService
@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 @RestController
 @RequestMapping("/v1/beers")
 @Tag(name = "Beers", description = "Beer management APIs")
-class BeerController(private val beerService: BeerService, private val beerPresenter: BeerPresenterOutputPort){
+class BeerController(private val beerService: BeerService, private val beerPresenter: BeerPresenterPort){
     @Operation(summary = "Register a new beer", description = "Creates a new beer record.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Beer created successfully"),
@@ -40,8 +40,8 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getBeersJson(@PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable): ResponseEntity<ApiCollectionResponseDTO<List<BeerResponseDTO>>>{
-        val beers = this.beerService.getBeers(PageRequest(number = page.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
+    fun getBeersJson(@PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable?): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>>{
+        val beers = this.beerService.getBeers(PageRequest(number = page!!.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
         return ResponseEntity.ok(beerPresenter.prepareJsonData(page, beers))
     }
 
@@ -65,9 +65,9 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "404", description = "Beer not found")
     ])
     @GetMapping("/{beerId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getSpecificBeer(@PathVariable beerId: Long): ResponseEntity<BeerResponseDTO>{
+    fun getSpecificBeer(@PathVariable beerId: Long): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>>{
         val beer = this.beerService.getSpecificBeer(beerId)
-        return ResponseEntity.ok(BeerMapper.mapToBeerResponseDTO(beer))
+        return ResponseEntity.ok(beerPresenter.prepareGetBeer(beer))
     }
 
     @Operation(summary = "Update a beer", description = "Updates an existing beer by ID.")
@@ -76,14 +76,14 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "404", description = "Beer not found")
     ])
     @PatchMapping("/{beerId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateBeer(@PathVariable beerId: Long, @RequestBody beerUpdateRequest: BeerUpdateRequestDTO): ResponseEntity<BeerResponseDTO>{
+    fun updateBeer(@PathVariable beerId: Long, @RequestBody beerUpdateRequest: BeerUpdateRequestDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>>{
         val beer = this.beerService.updateBeer(beerId, UpdateBeerModel(
             name = beerUpdateRequest.name,
             alcoholContent = beerUpdateRequest.alcoholContent,
             breweryId = beerUpdateRequest.breweryId,
             styleId = beerUpdateRequest.styleId,
             year = beerUpdateRequest.year))
-        return ResponseEntity.ok().body(BeerMapper.mapToBeerResponseDTO(beer))
+        return ResponseEntity.ok().body(beerPresenter.prepareUpdateBrewery(beer))
     }
 
     @Operation(summary = "Delete a beer", description = "Deletes a beer by ID.")

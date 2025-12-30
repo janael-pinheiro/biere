@@ -47,7 +47,7 @@ class CountryController(private val countryService: CountryService, private val 
     @GetMapping("/{countryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificCountry(@PathVariable countryId: Long): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val countryResponse = this.countryService.getSpecificCountry(countryId)
-        return ResponseEntity.ok(this.countryPresenter.prepareGetStyle(countryResponse))
+        return ResponseEntity.ok(this.countryPresenter.prepareGetCountry(countryResponse))
     }
 
     @Operation(summary = "Delete a country", description = "Deletes a country by ID.")
