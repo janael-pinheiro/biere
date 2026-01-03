@@ -2,6 +2,7 @@ package com.biere.catalog.containers.api.controllers.brewery
 
 import com.biere.catalog.containers.api.dtos.*
 import com.biere.catalog.containers.api.presenters.BreweryPresenterAdapter
+import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.core.services.BreweryService
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -32,7 +33,7 @@ class BreweryController(private val breweryService: BreweryService, private val 
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getBreweries(): ResponseEntity<ApiCollectionResponseDTO<List<BreweryResponseDTO>>>{
+    fun getBreweries(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>>>{
         val breweries = breweryService.getBreweries()
         return ResponseEntity.ok(this.breweryPresenter.prepareGetAllBreweries(breweries))
     }
@@ -66,6 +67,11 @@ class BreweryController(private val breweryService: BreweryService, private val 
     ])
     @DeleteMapping("/{breweryId}")
     fun deleteBrewery(@PathVariable breweryId: Long): ResponseEntity<Void>{
+        try {
+            this.breweryService.deleteBrewery(breweryId)
+        } catch (_: NotFoundException){
+            return ResponseEntity.notFound().build()
+        }
         return ResponseEntity.noContent().build()
     }
 }

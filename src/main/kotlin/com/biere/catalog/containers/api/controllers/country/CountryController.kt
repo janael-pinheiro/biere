@@ -34,7 +34,7 @@ class CountryController(private val countryService: CountryService, private val 
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getCountries(): ResponseEntity<ApiCollectionResponseDTO<List<CountryResponseDTO>>>{
+    fun getCountries(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<CountryResponseDTO>>>>{
         val countries = this.countryService.getCountries()
         return ResponseEntity.ok(this.countryPresenter.prepareGetAllCountries(countries))
     }

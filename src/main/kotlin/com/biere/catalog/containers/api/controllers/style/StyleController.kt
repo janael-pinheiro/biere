@@ -4,6 +4,7 @@ import com.biere.catalog.containers.api.dtos.*
 import com.biere.catalog.containers.api.helpers.withMethod
 import com.biere.catalog.containers.api.mappers.StyleMapper
 import com.biere.catalog.containers.api.presenters.StylePresenterAdapter
+import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.core.services.StyleService
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
@@ -36,7 +37,7 @@ class StyleController(private val styleService: StyleService, private val styleP
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getStyles(): ResponseEntity<ApiCollectionResponseDTO<List<StyleResponseDTO>>> {
+    fun getStyles(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<StyleResponseDTO>>>> {
         val styles = styleService.getStyles()
         return ResponseEntity.ok(stylePresenter.prepareGetStyles(styles))
     }
@@ -64,5 +65,20 @@ class StyleController(private val styleService: StyleService, private val styleP
         }
         val style = styleService.updateStyle(styleId, style)
         return ResponseEntity.ok().body(stylePresenter.prepareUpdateStyle(style))
+    }
+
+    @Operation(summary = "Delete a style", description = "Deletes an existing style by ID.")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "Successfully deleted the style"),
+        ApiResponse(responseCode = "404", description = "Style not found")
+    ])
+    @DeleteMapping("{styleId}")
+    fun deleteStyle(@PathVariable styleId: Long): ResponseEntity<Void> {
+        try {
+            styleService.deleteStyle(styleId)
+        } catch (e: NotFoundException) {
+            return ResponseEntity.notFound().build()
+        }
+        return ResponseEntity.noContent().build()
     }
 }

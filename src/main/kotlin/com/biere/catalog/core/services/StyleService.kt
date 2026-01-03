@@ -40,4 +40,11 @@ class StyleService(private val styleRepository: StyleRepository) {
         styleRepository.save(styleEntity)
         return StyleResponseModel(id = styleEntity.id!!, name = styleEntity.name)
     }
+
+    fun deleteStyle(styleId: Long) {
+        if (!styleRepository.existsById(styleId)){
+            throw NotFoundException("Style not found.")
+        }
+        styleRepository.deleteById(styleId)
+    }
 }

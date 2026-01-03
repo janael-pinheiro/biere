@@ -31,8 +31,9 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
         return this.prepareGetBrewery(breweryModel)
     }
 
-    fun prepareGetAllBreweries(breweries: List<BreweryModel>): ApiCollectionResponseDTO<List<BreweryResponseDTO>> {
-        val breweries = ApiCollectionResponseDTO(data = breweries.map { breweryMapper.toBreweryDto(it) }, page = null)
+    fun prepareGetAllBreweries(breweries: List<BreweryModel>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>> {
+        val response = breweries.map { brewery -> prepareGetBrewery(brewery) }
+        val breweries = ApiCollectionResponseDTO(data = response, page = null)
         this.addCreateBreweryLink(breweries)
         return breweries
     }
@@ -65,7 +66,7 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
             .withMethod("DELETE"))
     }
 
-    private fun addCreateBreweryLink(response: ApiCollectionResponseDTO<List<BreweryResponseDTO>>) {
+    private fun addCreateBreweryLink(response: ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>>) {
         response.add(linkTo(methodOn(BreweryController::class.java)
             .register(BreweryRegistrationDTO("", 0)))
             .withRel("create_new_brewery")

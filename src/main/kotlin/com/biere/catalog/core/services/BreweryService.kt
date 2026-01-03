@@ -49,4 +49,11 @@ class BreweryService(private val breweryRepository: BreweryRepository, private v
         breweryRepository.save(brewery)
         return BreweryModel(id = brewery.id!!, name = brewery.name, country = CountryModel(id = brewery.country.id!!, name = brewery.country.name))
     }
+
+    fun deleteBrewery(breweryId: Long) {
+        if (!breweryRepository.existsById(breweryId)){
+            throw NotFoundException("Brewery not found.")
+        }
+        breweryRepository.deleteById(breweryId)
+    }
 }

@@ -1,8 +1,10 @@
 package com.biere.catalog.containers.api.presenters
 
+import com.biere.catalog.containers.api.controllers.brewery.BreweryController
 import com.biere.catalog.containers.api.controllers.style.StyleController
 import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
+import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleUpdateRequestDTO
@@ -20,6 +22,7 @@ class StylePresenterAdapter(private val styleMapper: StyleMapper = StyleMapper()
         val styleResponse = ApiIndividualResponseDTO(data = styleDto)
         this.addSelfLink(styleResponse)
         this.addUpdateSelfLink(styleResponse)
+        this.addDeleteLink(styleResponse)
         return styleResponse
     }
 
@@ -27,8 +30,9 @@ class StylePresenterAdapter(private val styleMapper: StyleMapper = StyleMapper()
         return this.prepareGetStyle(styleModel)
     }
 
-    fun prepareGetStyles(styles: List<StyleResponseModel>): ApiCollectionResponseDTO<List<StyleResponseDTO>> {
-        val stylesResponse = ApiCollectionResponseDTO(data = styles.map { styleMapper.toStyleDTO(it) }, page = null)
+    fun prepareGetStyles(styles: List<StyleResponseModel>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<StyleResponseDTO>>> {
+        val response = styles.map { style -> prepareGetStyle(style) }
+        val stylesResponse = ApiCollectionResponseDTO(data = response, page = null)
         this.addCreateStyleLink(stylesResponse)
         return stylesResponse
     }
@@ -54,7 +58,14 @@ class StylePresenterAdapter(private val styleMapper: StyleMapper = StyleMapper()
             .withMethod("PUT"))
     }
 
-    private fun addCreateStyleLink(response: ApiCollectionResponseDTO<List<StyleResponseDTO>>) {
+    private fun addDeleteLink(response: ApiIndividualResponseDTO<StyleResponseDTO>) {
+        response.add(linkTo(methodOn(StyleController::class.java)
+            .deleteStyle(response.data.id))
+            .withRel("delete_style")
+            .withMethod("DELETE"))
+    }
+
+    private fun addCreateStyleLink(response: ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<StyleResponseDTO>>>) {
         response.add(linkTo(methodOn(StyleController::class.java)
             .register(StyleRegistrationDTO("")))
             .withRel("create_new_style")

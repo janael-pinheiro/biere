@@ -34,8 +34,9 @@ class CountryPresenterAdapter(private val countryMapper: CountryMapper = Country
         return this.prepareGetCountry(countryModel)
     }
 
-    fun prepareGetAllCountries(countries: List<CountryModel>): ApiCollectionResponseDTO<List<CountryResponseDTO>> {
-        val countries = ApiCollectionResponseDTO(data = countries.map { countryMapper.toCountryDto(it) }, page = null)
+    fun prepareGetAllCountries(countries: List<CountryModel>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<CountryResponseDTO>>> {
+        val response = countries.stream().map { country -> prepareGetCountry(country) }.toList()
+        val countries = ApiCollectionResponseDTO(data = response, page = null)
         this.addCreateCountryLink(countries)
         return countries
     }
@@ -68,7 +69,7 @@ class CountryPresenterAdapter(private val countryMapper: CountryMapper = Country
             .withMethod("DELETE"))
     }
 
-    private fun addCreateCountryLink(response: ApiCollectionResponseDTO<List<CountryResponseDTO>>) {
+    private fun addCreateCountryLink(response: ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<CountryResponseDTO>>>) {
         response.add(linkTo(methodOn(CountryController::class.java)
             .registerCountry(CountryRegistrationDTO("")))
             .withRel("create_new_country")
