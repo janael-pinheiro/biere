@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
 @RequestMapping("/v1/beers")
@@ -42,7 +43,8 @@ class BeerController(private val beerService: BeerService, private val beerPrese
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getBeersJson(@PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable?): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>>{
         val beers = this.beerService.getBeers(PageRequest(number = page!!.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
-        return ResponseEntity.ok(beerPresenter.prepareJsonData(page, beers))
+        val uri = ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString()
+        return ResponseEntity.ok(beerPresenter.prepareJsonData(page, beers, uri))
     }
 
     @Operation(summary = "Get all beers (CSV)", description = "Retrieves a list of beers in CSV format.")

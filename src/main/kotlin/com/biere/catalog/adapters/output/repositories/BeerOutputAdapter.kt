@@ -17,7 +17,10 @@ class BeerOutputAdapter(
         val size = page.size.coerceAtMost(100)
         val beers = beerRepository.findAll(org.springframework.data.domain.PageRequest.of(page.number, size, Sort.by(page.sort)))
         val outputBeers: List<OutputBeerModel> = beers.stream().map( BeerEntityMapper::mapToOutputBeer).toList()
-        val outputPage = PageMetadata(totalElements = beers.totalElements, totalPages = beers.totalPages, null, null, null ,null, page.number)
+        val lastPage = beers.totalPages - 1
+        val nextPage = if (page.number < lastPage) page.number + 1 else page.number
+        val previousPage = if (page.number > 0) page.number - 1 else page.number
+        val outputPage = PageMetadata(totalElements = beers.totalElements, totalPages = beers.totalPages, 0, lastPage, nextPage ,previousPage, page.number)
         return PaginatedResult(outputBeers, outputPage)
     }
 

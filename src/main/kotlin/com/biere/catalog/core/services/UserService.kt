@@ -16,7 +16,10 @@ import io.jsonwebtoken.io.Encoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.util.DigestUtils
+import java.nio.charset.Charset
 import java.security.Key
+import java.security.MessageDigest
 import java.util.*
 
 @Service
@@ -58,7 +61,20 @@ class UserService(
     }
 
     private fun isUserValid(email: String, password: String): Boolean {
-        return userRepository.existsByEmailAndPassword(email, password)
+        val hashedPassword = generatePasswordHash(password)
+        return userRepository.existsByEmailAndPassword(email, hashedPassword)
+    }
+
+    private fun generatePasswordHash(password: String): String {
+        return try {
+            val messageDigest = MessageDigest.getInstance("SHA-1")
+            messageDigest.update(password.toByteArray(charset("UTF-8")))
+            val bytes = messageDigest.digest()
+            bytes.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
     }
 
   fun isTokenValid(token: String) {

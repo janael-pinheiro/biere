@@ -8,28 +8,31 @@ import com.biere.catalog.containers.api.controllers.style.StyleController
 import com.biere.catalog.containers.api.dtos.*
 import com.biere.catalog.containers.api.helpers.withMethod
 import com.biere.catalog.core.boundaries.output.BeerPresenterPort
-import com.biere.catalog.core.models.BreweryModel
-import com.biere.catalog.core.models.InputBeerModel
 import com.biere.catalog.core.models.OutputBeerModel
 import com.biere.catalog.core.models.PaginatedResult
 import com.opencsv.CSVWriter
 import com.opencsv.bean.StatefulBeanToCsvBuilder
 import org.springframework.core.io.ByteArrayResource
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets
 
 class BeerPresenterAdapter: BeerPresenterPort {
-    override fun prepareJsonData(page: Pageable?, input: PaginatedResult<List<OutputBeerModel>>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>{
+    override fun prepareJsonData(
+        page: Pageable?,
+        input: PaginatedResult<List<OutputBeerModel>>,
+        uri: String): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>{
         val outputPage = PageDTO(
             totalPages = input.metadata.totalPages,
             totalElements = input.metadata.totalElements,
-            next = "/v1/beers?page=${input.metadata.next}&size=${page!!.pageSize}&sort=name",
-            previous = "/v1/beers?page=${input.metadata.previous}&size=${page.pageSize}&sort=name",
-            first = "/v1/beers?page=0&size=${page.pageSize}&sort=name",
-            last = "/v1/beers?page=${input.metadata.last}&size=${page.pageSize}&sort=name",
+            next = "${uri}?page=${input.metadata.next}&size=${page!!.pageSize}&sort=name",
+            previous = "${uri}?page=${input.metadata.previous}&size=${page.pageSize}&sort=name",
+            first = "${uri}?page=0&size=${page.pageSize}&sort=name",
+            last = "${uri}?page=${input.metadata.last}&size=${page.pageSize}&sort=name",
             current = input.metadata.current
         )
         val beersResponse = input.data.stream().map { beer -> prepareGetBeer(beer) }.toList()
@@ -76,9 +79,11 @@ class BeerPresenterAdapter: BeerPresenterPort {
             .withMethod("GET"))
     }
 
-    private fun addGetAllBeersLink(response: ApiIndividualResponseDTO<BeerResponseDTO>) {
+    private fun addGetAllBeersLink(
+        response: ApiIndividualResponseDTO<BeerResponseDTO>,
+        page: Pageable = PageRequest.of(0, 0, Sort.unsorted())) {
         response.add(linkTo(methodOn(BeerController::class.java)
-            .getBeersJson(null))
+            .getBeersJson(page))
             .withRel("get_all_beers")
             .withMethod("GET"))
     }
