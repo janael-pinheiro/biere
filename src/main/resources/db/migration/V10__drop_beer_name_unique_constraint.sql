@@ -1,1 +1,0 @@
-ALTER TABLE beers DROP CONSTRAINT beers_name_key;

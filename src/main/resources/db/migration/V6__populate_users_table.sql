@@ -1,1 +1,1 @@
-INSERT INTO users(name, email, password) values('janael', 'janael@example.com', 'fsdfs');
+INSERT INTO users(name, email, password) values('admin', 'admin@example.com', '212419af43263e2130bac0b5041d89e217bb6cbd');

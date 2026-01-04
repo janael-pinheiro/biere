@@ -1,2 +1,2 @@
-CREATE TABLE beers(id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL UNIQUE, country_id integer NOT NULL, alcohol_content float NOT NULL, brewery VARCHAR(255) NOT NULL);
+CREATE TABLE beers(id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, country_id integer NOT NULL, alcohol_content float NOT NULL, brewery VARCHAR(255) NOT NULL);
 ALTER TABLE beers ADD CONSTRAINT fk_country_id FOREIGN KEY (country_id) REFERENCES countries(id);
