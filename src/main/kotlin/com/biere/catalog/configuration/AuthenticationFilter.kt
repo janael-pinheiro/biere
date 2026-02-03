@@ -56,6 +56,9 @@ class AuthenticationFilter(
                 path == "/v1/users/refresh-token" ||
                 path == "/error" ||
                 path.contains("/v3/api-docs") ||
-                path.contains("/swagger-ui")
+                path.contains("/swagger-ui") ||
+                path == "/actuator/health" ||
+                path == "/actuator/prometheus" ||
+                path == "/actuator/metrics"
     }
 }

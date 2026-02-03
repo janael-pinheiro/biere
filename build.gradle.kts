@@ -31,6 +31,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-hateoas")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("io.micrometer:micrometer-registry-prometheus:1.16.1")
+	implementation("io.micrometer:micrometer-tracing-bridge-otel:1.6.1")
+	implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+	implementation("com.github.loki4j:loki-logback-appender:2.0.2")
 
 	// Kotlin/Jackson
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -78,6 +83,7 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	systemProperty("api.version", "1.44")
 }
 
 flyway {
@@ -92,4 +98,8 @@ openApi {
 	outputDir.set(layout.buildDirectory.dir("docs"))
 	outputFileName.set("openapi.yaml")
 	waitTimeInSeconds.set(60)
+}
+
+configurations.all {
+	exclude(group = "commons-logging", module = "commons-logging")
 }

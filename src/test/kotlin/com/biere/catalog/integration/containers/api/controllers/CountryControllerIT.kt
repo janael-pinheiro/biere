@@ -51,17 +51,11 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(name = newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiIndividualResponseDTO::class.java)
-            .consumeWith { response -> val country = response.responseBody
-                assertEquals(2, country?.links?.toList()?.size)
-            }
-
-        webTestClient
-            .get()
-            .uri(countriesUri)
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(ApiIndividualResponseDTO::class.java)
+            .expectBody()
+            .jsonPath("$.data.name").isEqualTo(newCountryName)
+            .jsonPath("$._links.self.href").exists()
+            .jsonPath("$._links.update_country.href").exists()
+            .jsonPath("$._links.delete_country.href").exists()
     }
 
     @Test
@@ -74,10 +68,10 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiIndividualResponseDTO::class.java)
-            .consumeWith { response -> val countries = response.responseBody
-                countryUrl =
-                    countries?.links?.filter{ link -> link.toString().contains("GET")}?.get(0).toString().split(" ")[1]
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                countryUrl = (links["self"] as Map<*, *>)["href"] as String
             }
 
         webTestClient
@@ -85,10 +79,9 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .uri(countryUrl)
             .exchange()
             .expectStatus().isOk
-            .expectBody(CountryRegistrationDTO::class.java)
-            .consumeWith { response -> val country = response.responseBody
-                assertEquals(newCountryName, country?.name)
-            }
+            .expectBody()
+            .jsonPath("$.data.name").isEqualTo(newCountryName)
+            .jsonPath("$._links.self.href").exists()
     }
 
     @Test
@@ -101,10 +94,10 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .bodyValue(CountryRegistrationDTO(newCountryName))
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiIndividualResponseDTO::class.java)
-            .consumeWith { response -> val countries = response.responseBody
-                countryUrl =
-                    countries?.links?.filter{ link -> link.toString().contains("DELETE")}?.get(0).toString().split(" ")[1]
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                countryUrl = (links["self"] as Map<*, *>)["href"] as String
             }
 
         webTestClient

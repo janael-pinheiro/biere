@@ -48,7 +48,7 @@ class UserController(
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun createUser(@RequestBody user: UserRegistrationDTO): ResponseEntity<String> {
-        val userId = userService.registerUser(InputUser(name = user.name, email = user.email, password = user.password))
+        userService.registerUser(InputUser(name = user.name, email = user.email, password = user.password))
         return ResponseEntity.created(URI("")).body("")
     }
 

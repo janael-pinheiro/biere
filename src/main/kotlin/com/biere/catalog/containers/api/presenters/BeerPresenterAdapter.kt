@@ -56,8 +56,10 @@ class BeerPresenterAdapter: BeerPresenterPort {
     }
 
     override fun prepareRegistrationResponse(input: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {
-        val outputBeer = BeerMapper.mapToBeerResponseDTO(input)
-        return ApiIndividualResponseDTO(data = outputBeer)
+        val beerDto = ApiIndividualResponseDTO(data = BeerMapper.mapToBeerResponseDTO(input))
+        this.addSelfLink(beerDto)
+        this.addUpdateLink(beerDto)
+        return beerDto
     }
 
     override fun prepareGetBeer(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {

@@ -36,9 +36,9 @@ class CountryPresenterAdapter(private val countryMapper: CountryMapper = Country
 
     fun prepareGetAllCountries(countries: List<CountryModel>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<CountryResponseDTO>>> {
         val response = countries.stream().map { country -> prepareGetCountry(country) }.toList()
-        val countries = ApiCollectionResponseDTO(data = response, page = null)
-        this.addCreateCountryLink(countries)
-        return countries
+        val outputCountries = ApiCollectionResponseDTO(data = response, page = null)
+        this.addCreateCountryLink(outputCountries)
+        return outputCountries
     }
 
     private fun addSelfLink(response: ApiIndividualResponseDTO<CountryResponseDTO>) {

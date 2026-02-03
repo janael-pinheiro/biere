@@ -10,15 +10,9 @@ import org.testcontainers.utility.DockerImageName
 @TestConfiguration(proxyBeanMethods = false)
 class PostgresTestContainersConfiguration {
 
-    companion object {
-        @ServiceConnection
-        @Container
-        @JvmStatic
-        val postgresContainer = PostgreSQLContainer(DockerImageName.parse("postgres:latest"))
-    }
     @Bean
+    @ServiceConnection
     fun postgresContainer(): PostgreSQLContainer<*> {
-
-        return postgresContainer
+        return PostgreSQLContainer(DockerImageName.parse("postgres:13.16-bookworm"))
     }
 }

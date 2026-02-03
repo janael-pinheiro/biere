@@ -10,7 +10,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 @SpringBootTest(classes = [com.biere.catalog.containers.api.CatalogApplication::class])
 @Testcontainers
-@EnableAutoConfiguration(exclude=[SecurityAutoConfiguration::class])
 class CatalogApplicationTests {
 
 	@MockitoBean

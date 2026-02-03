@@ -1,3 +1,0 @@
-CREATE TABLE styles(id SERIAL primary key, name VARCHAR(255) NOT NULL UNIQUE);
-ALTER TABLE beers ADD COLUMN style_id INTEGER NOT NULL;
-ALTER TABLE beers ADD CONSTRAINT fk_style_id FOREIGN KEY(style_id) REFERENCES styles(id);

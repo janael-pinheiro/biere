@@ -4,6 +4,8 @@ import com.biere.catalog.containers.api.dtos.TokenRequestDTO
 import com.biere.catalog.containers.api.dtos.TokenResponseDTO
 import com.biere.catalog.adapters.entities.UserEntity
 import com.biere.catalog.adapters.output.repositories.UserRepository
+import com.biere.catalog.core.services.UserService
+import com.biere.catalog.core.models.InputUser
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,13 +22,14 @@ import kotlin.test.assertEquals
 @ActiveProfiles("test")
 class AuthenticationControllerIT(
     @Autowired private val webTestClient: WebTestClient,
-    @Autowired private val userRepository: UserRepository) {
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val userService: UserService) {
 
     @Test
     fun `when invalid user or password, should return unauthorized status`(){
         webTestClient
             .post()
-            .uri("/v1/login")
+            .uri("/v1/users/login")
             .bodyValue(TokenRequestDTO(email = "test", password = "password"))
             .exchange()
             .expectStatus().isUnauthorized
@@ -36,10 +39,10 @@ class AuthenticationControllerIT(
     fun `when valid user or password, should return generated token`(){
         val password = "password"
         val email = "test@email.com"
-        userRepository.save(UserEntity(name="test", email = "test@email.com", password = "password"))
+        userService.registerUser(InputUser(name="test", email = email, password = password))
         webTestClient
             .post()
-            .uri("/v1/login")
+            .uri("/v1/users/login")
             .bodyValue(TokenRequestDTO(email = email, password = password))
             .exchange()
             .expectStatus().isOk

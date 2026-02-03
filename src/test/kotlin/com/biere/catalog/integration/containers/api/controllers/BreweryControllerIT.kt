@@ -6,6 +6,7 @@ import com.biere.catalog.containers.api.dtos.BreweryResponseDTO
 import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
+import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,10 +52,11 @@ class BreweryControllerIT(
             .bodyValue(newBrewery)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val brewery = response.responseBody
-                assertEquals(1, brewery?.links?.toList()?.size)
-            }
+            .expectBody()
+            .jsonPath("$._links.self.href").exists()
+            .jsonPath("$._links.update_brewery.href").exists()
+            .jsonPath("$._links.delete_brewery.href").exists()
+            .jsonPath("$._links.get_all_breweries.href").exists()
     }
 
     @Test
@@ -67,10 +69,10 @@ class BreweryControllerIT(
             .bodyValue(newBrewery)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val breweryResponse = response.responseBody
-                breweryUrl =
-                    breweryResponse?.links?.filter { link -> link.toString().contains("GET") }?.get(0).toString().split(" ")[1]
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                breweryUrl = (links["self"] as Map<*, *>)["href"] as String
             }
 
         webTestClient
@@ -78,9 +80,8 @@ class BreweryControllerIT(
             .uri(breweryUrl)
             .exchange()
             .expectStatus().isOk
-            .expectBody(BreweryResponseDTO::class.java)
-            .consumeWith { response -> val brewery = response.responseBody
-                assertEquals(newBrewery.name, brewery?.name)
-            }
+            .expectBody()
+            .jsonPath("$.data.name").isEqualTo(newBrewery.name)
+            .jsonPath("$._links.self.href").exists()
     }
 }

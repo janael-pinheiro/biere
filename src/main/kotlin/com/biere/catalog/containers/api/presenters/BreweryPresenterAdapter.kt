@@ -5,7 +5,6 @@ import com.biere.catalog.containers.api.dtos.*
 import com.biere.catalog.containers.api.helpers.withMethod
 import com.biere.catalog.containers.api.mappers.BreweryMapper
 import com.biere.catalog.core.models.BreweryModel
-import com.biere.catalog.core.models.CountryModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
 
@@ -33,9 +32,9 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
 
     fun prepareGetAllBreweries(breweries: List<BreweryModel>): ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>> {
         val response = breweries.map { brewery -> prepareGetBrewery(brewery) }
-        val breweries = ApiCollectionResponseDTO(data = response, page = null)
-        this.addCreateBreweryLink(breweries)
-        return breweries
+        val outputBreweries = ApiCollectionResponseDTO(data = response, page = null)
+        this.addCreateBreweryLink(outputBreweries)
+        return outputBreweries
     }
 
     private fun addSelfLink(response: ApiIndividualResponseDTO<BreweryResponseDTO>) {

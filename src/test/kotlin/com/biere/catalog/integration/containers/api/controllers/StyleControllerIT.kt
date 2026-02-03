@@ -2,6 +2,7 @@ package com.biere.catalog.integration.containers.api.controllers
 
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import com.biere.catalog.adapters.output.repositories.StyleRepository
+import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
 import org.junit.jupiter.api.AfterEach
@@ -44,10 +45,10 @@ class StyleControllerIT(
             .bodyValue(newStyle)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val style = response.responseBody
-                assertEquals(1, style?.links?.toList()?.size)
-            }
+            .expectBody()
+            .jsonPath("$._links.self.href").exists()
+            .jsonPath("$._links.update_style.href").exists()
+            .jsonPath("$._links.get_all_styles.href").exists()
     }
 
     @Test
@@ -60,10 +61,10 @@ class StyleControllerIT(
             .bodyValue(newStyle)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val styleResponse = response.responseBody
-                styleUrl =
-                    styleResponse?.links?.filter { link -> link.toString().contains("GET") }?.get(0).toString().split(" ")[1]
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                styleUrl = (links["self"] as Map<*, *>)["href"] as String
             }
 
         webTestClient
@@ -71,9 +72,8 @@ class StyleControllerIT(
             .uri(styleUrl)
             .exchange()
             .expectStatus().isOk
-            .expectBody(StyleResponseDTO::class.java)
-            .consumeWith { response -> val style = response.responseBody
-                assertEquals(newStyle.name, style?.name)
-            }
+            .expectBody()
+            .jsonPath("$.data.name").isEqualTo(newStyle.name)
+            .jsonPath("$._links.self.href").exists()
     }
 }

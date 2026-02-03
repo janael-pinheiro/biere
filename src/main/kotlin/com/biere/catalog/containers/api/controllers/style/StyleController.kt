@@ -63,8 +63,8 @@ class StyleController(private val styleService: StyleService, private val styleP
         if (style == null) {
             return ResponseEntity.notFound().build()
         }
-        val style = styleService.updateStyle(styleId, style)
-        return ResponseEntity.ok().body(stylePresenter.prepareUpdateStyle(style))
+        val updatedStyle = styleService.updateStyle(styleId, style)
+        return ResponseEntity.ok().body(stylePresenter.prepareUpdateStyle(updatedStyle))
     }
 
     @Operation(summary = "Delete a style", description = "Deletes an existing style by ID.")

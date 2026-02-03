@@ -5,6 +5,7 @@ import com.biere.catalog.adapters.output.repositories.StyleRepository
 import com.biere.catalog.containers.api.dtos.StyleRegistrationDTO
 import com.biere.catalog.containers.api.dtos.StyleResponseDTO
 import com.biere.catalog.containers.api.dtos.StyleUpdateRequestDTO
+import com.biere.catalog.core.exceptions.ConflictException
 import com.biere.catalog.core.exceptions.NotFoundException
 import com.biere.catalog.core.models.StyleResponseModel
 import org.springframework.stereotype.Service
@@ -14,7 +15,7 @@ import java.util.stream.Collectors
 class StyleService(private val styleRepository: StyleRepository) {
     fun register(style: StyleRegistrationDTO): StyleResponseModel{
         if (styleRepository.existsByName(style.name)){
-            throw NotFoundException("The name ${style.name} already exists.")
+            throw ConflictException("The name ${style.name} already exists.")
         }
         val savedStyle = styleRepository.save(StyleEntity(name = style.name))
         return StyleResponseModel(id = savedStyle.id ?: 0, name = savedStyle.name)

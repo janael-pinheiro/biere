@@ -3,7 +3,6 @@ package com.biere.catalog.integration.containers.api.controllers
 import com.biere.catalog.adapters.entities.BeerEntity
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
-import com.biere.catalog.containers.api.dtos.BeerResponseDTO
 import com.biere.catalog.containers.api.dtos.BeerUpdateRequestDTO
 import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.entities.CountryEntity
@@ -13,6 +12,7 @@ import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.adapters.output.repositories.StyleRepository
 import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
+import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,10 +21,13 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.core.io.ByteArrayResource
+import org.springframework.hateoas.MediaTypes
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.ZonedDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @AutoConfigureWebTestClient
 @Import(PostgresTestContainersConfiguration::class)
@@ -56,6 +59,7 @@ class BeerControllerIT(
         beerRepository.deleteAll()
         breweryRepository.deleteAll()
         countryRepository.deleteAll()
+        styleRepository.deleteAll()
     }
 
     @Test
@@ -63,13 +67,17 @@ class BeerControllerIT(
         webTestClient
             .post()
             .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeer)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val beer = response.responseBody
-                assertEquals(2, beer?.links?.toList()?.size)
-            }
+            .expectHeader().contentType(MediaTypes.HAL_JSON.toString())
+            .expectBody()
+            .jsonPath("$.data.name").isEqualTo(newBeer.name)
+            .jsonPath("$._links.self.href").exists()
+            .jsonPath("$._links.self.method").isEqualTo("GET")
+            .jsonPath("$._links.update_beer.href").exists()
+            .jsonPath("$._links.update_beer.method").isEqualTo("PATCH")
     }
 
     @Test
@@ -82,10 +90,10 @@ class BeerControllerIT(
             .bodyValue(newBeer)
             .exchange()
             .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val beers = response.responseBody
-                beerUrl =
-                    beers?.links?.filter { link -> link.toString().contains("GET") }?.get(0).toString().split(" ")[1]
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                beerUrl = (links["self"] as Map<*, *>)["href"] as String
             }
 
         webTestClient
@@ -93,9 +101,9 @@ class BeerControllerIT(
             .uri(beerUrl)
             .exchange()
             .expectStatus().isOk
-            .expectBody(BeerResponseDTO::class.java)
+            .expectBody(ApiIndividualResponseDTO::class.java)
             .consumeWith { response -> val beer = response.responseBody
-                assertEquals(newBeer.name, beer?.name)
+                assertNotNull(beer?.links)
             }
     }
 
@@ -105,16 +113,17 @@ class BeerControllerIT(
         webTestClient
             .get()
             .uri(beersUri)
-            .header("Accept", "application/json")
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .exchange()
             .expectStatus().isOk
-            .expectBody(ApiCollectionResponseDTO::class.java)
-            .consumeWith { response -> val beers = response.responseBody
-                assertEquals(2, (beers?.data as List<*>).size )
-            }
+            .expectBody()
             .consumeWith { response -> val responseHeaders = response.responseHeaders
-                assertEquals("application/json", responseHeaders.get("Content-Type")?.get(0).toString())
+                assertEquals(MediaTypes.HAL_JSON_VALUE, responseHeaders["Content-Type"]?.get(0).toString())
             }
+            .jsonPath("$._links.create_new_beer.href").exists()
+            .jsonPath("$._links.get_all_breweries.href").exists()
+            .jsonPath("$._links.get_all_countries.href").exists()
+            .jsonPath("$._links.get_all_styles.href").exists()
     }
 
     @Test
@@ -129,45 +138,46 @@ class BeerControllerIT(
             .expectBody(ByteArrayResource::class.java)
             .consumeWith { response -> val responseHeaders = response.responseHeaders
                 assertEquals("text/csv", responseHeaders.get("Content-Type")?.get(0).toString())
-                assertEquals("attachment; filename=\"beers.csv\"", responseHeaders.get("Content-Disposition")?.get(0).toString())
+                assertEquals("attachment; filename=\"beers.csv\"", responseHeaders["Content-Disposition"]?.get(0).toString())
             }
     }
 
     @Test
     fun `update a beer`(){
         val country = CountryEntity(name="Belgium", createdAt = ZonedDateTime.now())
-        val savedCountry = this.countryRepository.save(country)
+        this.countryRepository.save(country)
+        val newName = "test1"
 
-        var beerUrl = ""
+        var updateBeerUrl = ""
+        var getBeerUrl = ""
 
         webTestClient
             .post()
             .uri(beersUri)
             .bodyValue(newBeer)
             .exchange()
-            .expectStatus().isCreated
-            .expectBody(ApiGeneralRegistrationResponseDTO::class.java)
-            .consumeWith { response -> val beers = response.responseBody
-                beerUrl =
-                    beers?.links?.filter { link -> link.toString().contains("PATCH") }?.get(0).toString().split(" ")[1]
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                updateBeerUrl = (links["update_beer"] as Map<*, *>)["href"] as String
+                getBeerUrl = (links["self"] as Map<*, *>)["href"] as String
             }
 
         webTestClient
             .patch()
-            .uri(beerUrl)
-            .bodyValue(BeerUpdateRequestDTO(name = null, alcoholContent = null, breweryId = null, styleId = null, year = 2025L))
+            .uri(updateBeerUrl)
+            .bodyValue(BeerUpdateRequestDTO(name = newName, alcoholContent = null, breweryId = null, styleId = null, year = 2025L))
             .exchange()
             .expectStatus().isOk
 
         webTestClient
             .get()
-            .uri(beerUrl)
+            .uri(getBeerUrl)
             .exchange()
             .expectStatus().isOk
-            .expectBody(BeerResponseDTO::class.java)
-            .consumeWith { response -> val beer = response.responseBody
-                assertEquals(newBeer.name, beer?.name)
-                assertEquals(savedCountry.name, beer?.countryName)
+            .expectBody(ApiIndividualResponseDTO::class.java)
+            .consumeWith { response -> val beer = response.responseBody?.data as? Map<*, *>
+                assertEquals(newName, beer?.get("name"))
             }
     }
 

@@ -19,8 +19,7 @@ class CountryService(private val countryRepository: CountryRepository) {
         }
         val now: ZonedDateTime = ZonedDateTime.now();
         val country = CountryEntity(name = countryRegistrationDTO.name, createdAt = now)
-        var savedCountry: CountryEntity? = null
-        savedCountry = countryRepository.save(country)
+        val savedCountry: CountryEntity = countryRepository.save(country)
         return CountryModel(id = savedCountry.id!!, name = savedCountry.name)
     }
 

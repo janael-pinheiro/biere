@@ -29,7 +29,7 @@ class SecurityConfiguration(private val authenticationFilter: AuthenticationFilt
             .sessionManagement { session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/v1/users/login", "/v1/users/refresh-token", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                    .requestMatchers("/v1/users/login", "/v1/users/refresh-token", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**", "/error").permitAll()
                     .anyRequest().hasAuthority("ROLE_USER") }
             .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter::class.java)
         return http.build()

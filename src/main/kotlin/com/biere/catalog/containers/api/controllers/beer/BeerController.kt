@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.hateoas.MediaTypes
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
@@ -29,7 +30,7 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "201", description = "Beer created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
-    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, "application/hal+json"])
     fun register(@Validated @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
         val beer = this.beerService.register(BeerMapper.mapToInputBeer(beerRegistrationDTO))
         val response = beerPresenter.prepareRegistrationResponse(beer)
@@ -40,7 +41,7 @@ class BeerController(private val beerService: BeerService, private val beerPrese
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
-    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
     fun getBeersJson(@PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable?): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>>{
         val beers = this.beerService.getBeers(PageRequest(number = page!!.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
         val uri = ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString()
