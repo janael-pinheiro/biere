@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import jakarta.validation.Valid
 import org.springframework.hateoas.MediaTypes
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
@@ -31,7 +32,7 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, "application/hal+json"])
-    fun register(@Validated @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
+    fun register(@Valid @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
         val beer = this.beerService.register(BeerMapper.mapToInputBeer(beerRegistrationDTO))
         val response = beerPresenter.prepareRegistrationResponse(beer)
         return ResponseEntity.created(URI("")).body(response)

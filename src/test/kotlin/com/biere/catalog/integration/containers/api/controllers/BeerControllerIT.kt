@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.ZonedDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
 @AutoConfigureWebTestClient
@@ -51,7 +52,7 @@ class BeerControllerIT(
         val savedCountry = this.countryRepository.save(country)
         brewery = this.breweryRepository.save(BreweryEntity(name = "Heineken", country = savedCountry))
         style = this.styleRepository.save(StyleEntity(name = "lager"))
-        newBeer = BeerRegistrationDTO(name = "Heineken", countryId = savedCountry.id ?: 0, alcoholContent = 4.5F, breweryId = brewery.id ?: 0, styleId = style.id ?: 0, year = 2024L)
+        newBeer = BeerRegistrationDTO(name = "Heineken", alcoholContent = 4.5F, breweryId = brewery.id ?: 0, styleId = style.id ?: 0, year = 2024L)
     }
 
     @AfterEach
@@ -78,6 +79,96 @@ class BeerControllerIT(
             .jsonPath("$._links.self.method").isEqualTo("GET")
             .jsonPath("$._links.update_beer.href").exists()
             .jsonPath("$._links.update_beer.method").isEqualTo("PATCH")
+    }
+
+    @Test
+    fun `register beer, when blank name should return bad request`(){
+        val newBeerWithoutName = newBeer.copy(name = "")
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithoutName)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Validation error")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("The name of the beer cannot be empty")
+    }
+
+    @Test
+    fun `register beer, when null alcohol content should return bad request`(){
+        val newBeerWithoutName = newBeer.copy(alcoholContent = null)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithoutName)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Validation error")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("Alcohol content can't be null")
+    }
+
+    @Test
+    fun `register beer, when alcohol content is greater than 100 percent should return bad request`(){
+        val newBeerWithoutName = newBeer.copy(alcoholContent = 100.1F)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithoutName)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Validation error")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("Alcohol content can't be greater than 100%")
+    }
+
+    @Test
+    fun `register beer, when null breweryId should return bad request`(){
+        val newBeerWithoutName = newBeer.copy(breweryId = null)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithoutName)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Validation error")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("breweryId can't be null")
+    }
+
+    @Test
+    fun `register beer, when null styleId should return bad request`(){
+        val newBeerWithoutName = newBeer.copy(styleId = null)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithoutName)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Validation error")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("styleId can't be null")
+    }
+
+    @Test
+    fun `register beer, when null year should return bad request`(){
+        val newBeerWithoutName = newBeer.copy(year = null)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithoutName)
+            .exchange()
+            .expectStatus().isBadRequest
+            .expectBody()
+            .jsonPath("$.title").isEqualTo("Validation error")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("year can't be null")
     }
 
     @Test
@@ -194,5 +285,58 @@ class BeerControllerIT(
             brewery = this.brewery,
             style = this.style,
             year = 2024L))
+    }
+
+    @Test
+    fun `delete a specific beer`(){
+        var beerUrl = ""
+
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .bodyValue(newBeer)
+            .exchange()
+            .expectStatus().isCreated
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                beerUrl = (links["self"] as Map<*, *>)["href"] as String
+            }
+
+        webTestClient
+            .delete()
+            .uri(beerUrl)
+            .exchange()
+            .expectStatus().isNoContent
+
+        val urlSequence = beerUrl.split("/")
+        val existsBeer = this.beerRepository.existsById(urlSequence[urlSequence.size-1].toLong())
+        assertFalse(existsBeer)
+    }
+
+    @Test
+    fun `delete a specific beer, when beer not found should return 404`(){
+        var beerUrl = ""
+
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .bodyValue(newBeer)
+            .exchange()
+            .expectStatus().isCreated
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                beerUrl = (links["self"] as Map<*, *>)["href"] as String
+            }
+
+        val urlSequence = beerUrl.split("/").toMutableList()
+        urlSequence[urlSequence.size-1] = "0"
+
+        webTestClient
+            .delete()
+            .uri(urlSequence.joinToString("/"))
+            .exchange()
+            .expectStatus().isNotFound
     }
 }

@@ -106,7 +106,7 @@ class BeerPresenterAdapter: BeerPresenterPort {
 
     private fun addCreateBeerLink(response: ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>) {
         response.add(linkTo(methodOn(BeerController::class.java)
-            .register(BeerRegistrationDTO("", 0, 0F, 0, 0, 0)))
+            .register(BeerRegistrationDTO("", 0F, 0, 0, 0)))
             .withRel("create_new_beer")
             .withMethod("POST"))
     }

@@ -11,11 +11,10 @@ interface BeerMapper {
         fun mapToInputBeer(input: BeerRegistrationDTO): InputBeerModel {
             return InputBeerModel(
                 name = input.name,
-                countryId = input.countryId,
-                alcoholContent = input.alcoholContent,
-                breweryId = input.breweryId,
-                styleId = input.styleId,
-                year = input.year)
+                alcoholContent = input.alcoholContent!!,
+                breweryId = input.breweryId!!,
+                styleId = input.styleId!!,
+                year = input.year!!)
         }
 
         fun mapToBeerResponseDTO(input: OutputBeerModel): BeerResponseDTO {

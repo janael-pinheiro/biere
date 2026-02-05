@@ -63,6 +63,9 @@ class BeerOutputAdapter(
     }
 
     override fun deleteBeer(beerId: Long) {
+        if (!this.beerRepository.existsById(beerId)){
+            throw NotFoundException("Beer not found.")
+        }
         beerRepository.deleteById(beerId)
     }
 }

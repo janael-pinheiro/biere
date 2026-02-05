@@ -5,7 +5,9 @@ import com.biere.catalog.core.exceptions.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import java.net.URI
@@ -84,6 +86,30 @@ class RestExceptionHandler {
             path = request.servletPath
         )
         return ResponseEntity(apiError, HttpStatus.UNAUTHORIZED)
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(
+        ex: MethodArgumentNotValidException
+    ): ResponseEntity<ProblemDetail> {
+        val problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.BAD_REQUEST,
+            "One or more fields are invalid. Make the adjustment and try again."
+        ).apply {
+            title = "Validation error"
+            type = URI.create("https://api.seuapp.com/errors/invalid-fields")
+
+            val errors = ex.bindingResult.fieldErrors.map { fieldError ->
+                mapOf(
+                    "field" to fieldError.field,
+                    "reason" to fieldError.defaultMessage
+                )
+            }
+
+            setProperty("invalid-params", errors)
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail)
     }
 
 }
