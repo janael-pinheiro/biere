@@ -93,7 +93,7 @@ class RestExceptionHandler {
         ex: MethodArgumentNotValidException
     ): ResponseEntity<ProblemDetail> {
         val problemDetail = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.UNPROCESSABLE_ENTITY,
             "One or more fields are invalid. Make the adjustment and try again."
         ).apply {
             title = "Validation error"
@@ -109,7 +109,7 @@ class RestExceptionHandler {
             setProperty("invalid-params", errors)
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail)
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(problemDetail)
     }
 
 }

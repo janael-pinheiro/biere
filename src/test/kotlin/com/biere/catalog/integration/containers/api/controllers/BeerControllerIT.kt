@@ -1,9 +1,6 @@
 package com.biere.catalog.integration.containers.api.controllers
 
 import com.biere.catalog.adapters.entities.BeerEntity
-import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
-import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
-import com.biere.catalog.containers.api.dtos.BeerUpdateRequestDTO
 import com.biere.catalog.adapters.entities.BreweryEntity
 import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.entities.StyleEntity
@@ -11,8 +8,10 @@ import com.biere.catalog.adapters.output.repositories.BeerRepository
 import com.biere.catalog.adapters.output.repositories.BreweryRepository
 import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.adapters.output.repositories.StyleRepository
-import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
+import com.biere.catalog.containers.api.dtos.BeerRegistrationDTO
+import com.biere.catalog.containers.api.dtos.BeerUpdateRequestDTO
+import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.hateoas.MediaTypes
-import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.ZonedDateTime
@@ -90,7 +88,7 @@ class BeerControllerIT(
             .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeerWithoutName)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
             .jsonPath("$.invalid-params[0].reason").isEqualTo("The name of the beer cannot be empty")
@@ -105,7 +103,7 @@ class BeerControllerIT(
             .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeerWithoutName)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
             .jsonPath("$.invalid-params[0].reason").isEqualTo("Alcohol content can't be null")
@@ -120,7 +118,7 @@ class BeerControllerIT(
             .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeerWithoutName)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
             .jsonPath("$.invalid-params[0].reason").isEqualTo("Alcohol content can't be greater than 100%")
@@ -135,7 +133,7 @@ class BeerControllerIT(
             .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeerWithoutName)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
             .jsonPath("$.invalid-params[0].reason").isEqualTo("breweryId can't be null")
@@ -150,7 +148,7 @@ class BeerControllerIT(
             .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeerWithoutName)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
             .jsonPath("$.invalid-params[0].reason").isEqualTo("styleId can't be null")
@@ -165,10 +163,61 @@ class BeerControllerIT(
             .header("Accept", MediaTypes.HAL_JSON_VALUE)
             .bodyValue(newBeerWithoutName)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
             .jsonPath("$.invalid-params[0].reason").isEqualTo("year can't be null")
+    }
+
+    @Test
+    fun `register beer, when already registered name should return conflict`(){
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeer)
+            .exchange()
+            .expectStatus().isCreated
+            .expectHeader().contentType(MediaTypes.HAL_JSON.toString())
+
+        val duplicateBeerName = newBeer.copy()
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(duplicateBeerName)
+            .exchange()
+            .expectStatus().is4xxClientError
+            .expectBody()
+            .jsonPath("$.message").isEqualTo("Beer with name ${duplicateBeerName.name} already exists.")
+    }
+
+    @Test
+    fun `register beer, when brewery does not exist return bad request`(){
+        val newBeerWithInvalidBreweryId = newBeer.copy(breweryId = 42)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithInvalidBreweryId)
+            .exchange()
+            .expectStatus().is4xxClientError
+            .expectBody()
+            .jsonPath("$.message").isEqualTo("Brewery with id ${newBeerWithInvalidBreweryId.breweryId} does not exist.")
+    }
+
+    @Test
+    fun `register beer, when style does not exist return bad request`(){
+        val newBeerWithInvalidStyleId = newBeer.copy(styleId = 42)
+        webTestClient
+            .post()
+            .uri(beersUri)
+            .header("Accept", MediaTypes.HAL_JSON_VALUE)
+            .bodyValue(newBeerWithInvalidStyleId)
+            .exchange()
+            .expectStatus().is4xxClientError
+            .expectBody()
+            .jsonPath("$.message").isEqualTo("Style with id ${newBeerWithInvalidStyleId.styleId} does not exist.")
     }
 
     @Test

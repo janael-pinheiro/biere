@@ -28,8 +28,8 @@ class BeerOutputAdapter(
         if (beerRepository.existsByName(inputBeer.name)) {
             throw ConflictException("Beer with name ${inputBeer.name} already exists.")
         }
-        val brewery = breweryRepository.findById(inputBeer.breweryId).get()
-        val style = styleRepository.findById(inputBeer.styleId).get()
+        val brewery = breweryRepository.findById(inputBeer.breweryId).orElseThrow { NotFoundException("Brewery with id ${inputBeer.breweryId} does not exist.") }
+        val style = styleRepository.findById(inputBeer.styleId).orElseThrow { NotFoundException("Style with id ${inputBeer.styleId} does not exist.") }
         val beer = BeerEntityMapper.mapToEntity(inputBeer, brewery, style)
         return BeerEntityMapper.mapToOutputBeer(beerRepository.save(beer))
     }
