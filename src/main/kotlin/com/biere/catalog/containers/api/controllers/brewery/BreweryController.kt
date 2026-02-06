@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import jakarta.validation.Valid
+import org.springframework.hateoas.MediaTypes
 
 @RestController
 @RequestMapping("/v1/breweries")
@@ -22,8 +24,8 @@ class BreweryController(private val breweryService: BreweryService, private val 
         ApiResponse(responseCode = "201", description = "Brewery created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
-    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun register(@RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
+    @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
+    fun register(@Valid @RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
         val brewery = this.breweryService.register(inputBrewery)
         return ResponseEntity.created(URI("/v1/breweries/${brewery.id}")).body(this.breweryPresenter.prepareRegisterBrewery(brewery))
     }
@@ -32,7 +34,7 @@ class BreweryController(private val breweryService: BreweryService, private val 
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
-    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
     fun getBreweries(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>>>{
         val breweries = breweryService.getBreweries()
         return ResponseEntity.ok(this.breweryPresenter.prepareGetAllBreweries(breweries))
@@ -67,11 +69,7 @@ class BreweryController(private val breweryService: BreweryService, private val 
     ])
     @DeleteMapping("/{breweryId}")
     fun deleteBrewery(@PathVariable breweryId: Long): ResponseEntity<Void>{
-        try {
-            this.breweryService.deleteBrewery(breweryId)
-        } catch (_: NotFoundException){
-            return ResponseEntity.notFound().build()
-        }
+        this.breweryService.deleteBrewery(breweryId)
         return ResponseEntity.noContent().build()
     }
 }

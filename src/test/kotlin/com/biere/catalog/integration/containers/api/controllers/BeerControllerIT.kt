@@ -284,10 +284,7 @@ class BeerControllerIT(
 
     @Test
     fun `update a beer`(){
-        val country = CountryEntity(name="Belgium", createdAt = ZonedDateTime.now())
-        this.countryRepository.save(country)
         val newName = "test1"
-
         var updateBeerUrl = ""
         var getBeerUrl = ""
 
@@ -319,21 +316,6 @@ class BeerControllerIT(
             .consumeWith { response -> val beer = response.responseBody?.data as? Map<*, *>
                 assertEquals(newName, beer?.get("name"))
             }
-    }
-
-    private fun registerBeers(){
-        this.beerRepository.save(BeerEntity(
-            name = "Heineken",
-            alcoholContent = 4.6F,
-            brewery = this.brewery,
-            style = this.style,
-            year = 2024L))
-        this.beerRepository.save(BeerEntity(
-            name = "Amstel",
-            alcoholContent = 4.6F,
-            brewery = this.brewery,
-            style = this.style,
-            year = 2024L))
     }
 
     @Test
@@ -387,5 +369,20 @@ class BeerControllerIT(
             .uri(urlSequence.joinToString("/"))
             .exchange()
             .expectStatus().isNotFound
+    }
+
+    private fun registerBeers(){
+        this.beerRepository.save(BeerEntity(
+            name = "Heineken",
+            alcoholContent = 4.6F,
+            brewery = this.brewery,
+            style = this.style,
+            year = 2024L))
+        this.beerRepository.save(BeerEntity(
+            name = "Amstel",
+            alcoholContent = 4.6F,
+            brewery = this.brewery,
+            style = this.style,
+            year = 2024L))
     }
 }

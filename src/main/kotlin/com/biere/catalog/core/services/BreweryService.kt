@@ -18,7 +18,7 @@ class BreweryService(private val breweryRepository: BreweryRepository, private v
         if (breweryRepository.existsByName(inputBrewery.name)){
             throw ConflictException("The name ${inputBrewery.name} already exists.")
         }
-        val country = countryRepository.findById(inputBrewery.countryId).get()
+        val country = countryRepository.findById(inputBrewery.countryId!!).orElseThrow { NotFoundException("Country ${inputBrewery.countryId} not found.") }
         val newBrewery = BreweryEntity(name = inputBrewery.name, country = country)
         val savedBrewery = breweryRepository.save(newBrewery)
         val countryModel = CountryModel(country.id!!, country.name)
