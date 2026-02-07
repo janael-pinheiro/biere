@@ -1,9 +1,11 @@
 package com.biere.catalog.integration.containers.api.controllers
 
+import com.biere.catalog.adapters.entities.CountryEntity
 import com.biere.catalog.adapters.output.repositories.CountryRepository
 import com.biere.catalog.containers.api.dtos.ApiCollectionResponseDTO
 import com.biere.catalog.containers.api.dtos.ApiIndividualResponseDTO
 import com.biere.catalog.containers.api.dtos.CountryRegistrationDTO
+import com.biere.catalog.containers.api.dtos.CountryUpdateRequestDTO
 import com.biere.catalog.integration.configuration.PostgresTestContainersConfiguration
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -13,9 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.ZonedDateTime
+import kotlin.collections.get
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 @AutoConfigureWebTestClient
 @Import(PostgresTestContainersConfiguration::class)
@@ -31,19 +34,6 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
     }
 
     @Test
-    fun `fetches countries`(){
-        webTestClient
-            .get()
-            .uri(countriesUri)
-            .exchange()
-            .expectStatus().isOk
-            .expectBody(ApiCollectionResponseDTO::class.java)
-            .consumeWith { response -> val countries = response.responseBody
-                assertNotNull(countries?.data)
-            }
-    }
-
-    @Test
     fun `register country`(){
         webTestClient
             .post()
@@ -56,6 +46,19 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .jsonPath("$._links.self.href").exists()
             .jsonPath("$._links.update_country.href").exists()
             .jsonPath("$._links.delete_country.href").exists()
+    }
+
+    @Test
+    fun `fetches countries`(){
+        webTestClient
+            .get()
+            .uri(countriesUri)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(ApiCollectionResponseDTO::class.java)
+            .consumeWith { response -> val countries = response.responseBody
+                assertNotNull(countries?.data)
+            }
     }
 
     @Test
@@ -82,6 +85,42 @@ class CountryControllerIT(@Autowired var webTestClient: WebTestClient, @Autowire
             .expectBody()
             .jsonPath("$.data.name").isEqualTo(newCountryName)
             .jsonPath("$._links.self.href").exists()
+    }
+
+    @Test
+    fun `update a country`(){
+        val newName = "test1"
+        var updateCountryUrl = ""
+        var getCountryUrl = ""
+
+        webTestClient
+            .post()
+            .uri(countriesUri)
+            .bodyValue(CountryRegistrationDTO(name = newCountryName))
+            .exchange()
+            .expectBody(Map::class.java)
+            .consumeWith { response ->
+                val links = response.responseBody?.get("_links") as Map<*, *>
+                updateCountryUrl = (links["update_country"] as Map<*, *>)["href"] as String
+                getCountryUrl = (links["self"] as Map<*, *>)["href"] as String
+            }
+
+        webTestClient
+            .put()
+            .uri(updateCountryUrl)
+            .bodyValue(CountryUpdateRequestDTO(name = newName))
+            .exchange()
+            .expectStatus().isOk
+
+        webTestClient
+            .get()
+            .uri(getCountryUrl)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(ApiIndividualResponseDTO::class.java)
+            .consumeWith { response -> val country = response.responseBody?.data as? Map<*, *>
+                assertEquals(newName, country?.get("name"))
+            }
     }
 
     @Test
