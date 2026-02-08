@@ -189,7 +189,7 @@ class BeerControllerIT(
             .exchange()
             .expectStatus().is4xxClientError
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Beer with name ${duplicateBeerName.name} already exists.")
+            .jsonPath("$.detail").isEqualTo("Beer with name ${duplicateBeerName.name} already exists.")
     }
 
     @Test
@@ -203,7 +203,7 @@ class BeerControllerIT(
             .exchange()
             .expectStatus().is4xxClientError
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Brewery with id ${newBeerWithInvalidBreweryId.breweryId} does not exist.")
+            .jsonPath("$.detail").isEqualTo("Brewery with id ${newBeerWithInvalidBreweryId.breweryId} does not exist.")
     }
 
     @Test
@@ -217,7 +217,7 @@ class BeerControllerIT(
             .exchange()
             .expectStatus().is4xxClientError
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Style with id ${newBeerWithInvalidStyleId.styleId} does not exist.")
+            .jsonPath("$.detail").isEqualTo("Style with id ${newBeerWithInvalidStyleId.styleId} does not exist.")
     }
 
     @Test

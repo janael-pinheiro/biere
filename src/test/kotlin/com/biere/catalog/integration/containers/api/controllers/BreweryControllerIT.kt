@@ -111,7 +111,7 @@ class BreweryControllerIT(
             .exchange()
             .expectStatus().is4xxClientError
             .expectBody()
-            .jsonPath("$.message").isEqualTo("The name ${newBrewery.name} already exists.")
+            .jsonPath("$.detail").isEqualTo("The name ${newBrewery.name} already exists.")
     }
 
     @Test
@@ -125,7 +125,7 @@ class BreweryControllerIT(
             .exchange()
             .expectStatus().is4xxClientError
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Country ${newBreweryWithInvalidBreweryId.countryId} not found.")
+            .jsonPath("$.detail").isEqualTo("Country ${newBreweryWithInvalidBreweryId.countryId} not found.")
     }
 
     @Test
@@ -259,7 +259,7 @@ class BreweryControllerIT(
             .exchange()
             .expectStatus().isNotFound
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Brewery not found.")
+            .jsonPath("$.detail").isEqualTo("Brewery not found.")
     }
 
     @Test
