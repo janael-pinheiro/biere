@@ -95,7 +95,7 @@ flyway {
 
 openApi {
 	apiDocsUrl.set("http://localhost:8080/v3/api-docs")
-	outputDir.set(layout.buildDirectory.dir("docs"))
+	outputDir.set(projectDir)
 	outputFileName.set("openapi.yaml")
 	waitTimeInSeconds.set(60)
 }

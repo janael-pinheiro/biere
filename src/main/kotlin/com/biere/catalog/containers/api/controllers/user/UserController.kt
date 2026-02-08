@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.Parameter
 
 @RestController
 @RequestMapping("/v1/users")
@@ -58,7 +59,10 @@ class UserController(
         ApiResponse(responseCode = "404", description = "User not found")
     ])
     @DeleteMapping("{userId}")
-    fun removeUser(@PathVariable userId: Long): ResponseEntity<String> {
+    fun removeUser(
+        @Parameter(description = "ID of the user to be removed", example = "1")
+        @PathVariable userId: Long
+    ): ResponseEntity<String> {
         userService.removeUser(userId)
         return ResponseEntity.ok().body("")
     }

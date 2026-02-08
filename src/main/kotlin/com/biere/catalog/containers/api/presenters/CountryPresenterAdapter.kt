@@ -11,6 +11,7 @@ import com.biere.catalog.containers.api.mappers.CountryMapper
 import com.biere.catalog.core.models.CountryModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford
 
 class CountryPresenterAdapter(private val countryMapper: CountryMapper = CountryMapper()) {
     fun prepareCreateCountry(countryModel: CountryModel): ApiIndividualResponseDTO<CountryResponseDTO> {
@@ -42,10 +43,13 @@ class CountryPresenterAdapter(private val countryMapper: CountryMapper = Country
     }
 
     private fun addSelfLink(response: ApiIndividualResponseDTO<CountryResponseDTO>) {
-        response.add(linkTo(methodOn(CountryController::class.java)
-            .getSpecificCountry(response.data.id!!))
+        val selfLink = linkTo(methodOn(CountryController::class.java).getSpecificCountry(response.data.id!!))
             .withSelfRel()
-            .withMethod("GET"))
+            .andAffordance(afford(methodOn(CountryController::class.java).updateCountry(response.data.id, CountryUpdateRequestDTO(""))))
+            .andAffordance(afford(methodOn(CountryController::class.java).deleteCountry(response.data.id)))
+            .withMethod("GET")
+            
+        response.add(selfLink)
     }
 
     private fun addGetAllCountriesLink(response: ApiIndividualResponseDTO<CountryResponseDTO>) {

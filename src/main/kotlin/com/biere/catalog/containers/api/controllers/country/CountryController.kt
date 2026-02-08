@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.Parameter
+import jakarta.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -22,7 +24,7 @@ class CountryController(private val countryService: CountryService, private val 
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun registerCountry(@RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
+    fun registerCountry(@Valid @RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.registerCountry(countryRegistrationDTO)
         return ResponseEntity
             .created(URI("/v1/countries/${country.id}"))
@@ -45,7 +47,10 @@ class CountryController(private val countryService: CountryService, private val 
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @GetMapping("/{countryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getSpecificCountry(@PathVariable countryId: Long): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
+    fun getSpecificCountry(
+        @Parameter(description = "ID of the country to be retrieved", example = "1")
+        @PathVariable countryId: Long
+    ): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val countryResponse = this.countryService.getSpecificCountry(countryId)
         return ResponseEntity.ok(this.countryPresenter.prepareGetCountry(countryResponse))
     }
@@ -56,7 +61,10 @@ class CountryController(private val countryService: CountryService, private val 
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @DeleteMapping("/{countryId}")
-    fun deleteCountry(@PathVariable countryId: Long): ResponseEntity<String> {
+    fun deleteCountry(
+        @Parameter(description = "ID of the country to be deleted", example = "1")
+        @PathVariable countryId: Long
+    ): ResponseEntity<String> {
         this.countryService.deleteCountry(countryId)
         return ResponseEntity.noContent().build()
     }
@@ -67,7 +75,11 @@ class CountryController(private val countryService: CountryService, private val 
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @PutMapping("{countryId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateCountry(@PathVariable countryId: Long, @RequestBody countryUpdateRequestDTO: CountryUpdateRequestDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
+    fun updateCountry(
+        @Parameter(description = "ID of the country to be updated", example = "1")
+        @PathVariable countryId: Long,
+        @Valid @RequestBody countryUpdateRequestDTO: CountryUpdateRequestDTO
+    ): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.updateCountry(countryId, countryUpdateRequestDTO)
         return ResponseEntity.ok(this.countryPresenter.prepareUpdateCountry(country))
     }

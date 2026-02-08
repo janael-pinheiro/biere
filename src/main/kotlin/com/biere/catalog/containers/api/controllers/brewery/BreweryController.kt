@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*
 import java.net.URI
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
@@ -46,7 +47,10 @@ class BreweryController(private val breweryService: BreweryService, private val 
         ApiResponse(responseCode = "404", description = "Brewery not found")
     ])
     @GetMapping("/{breweryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getSpecificBrewery(@PathVariable breweryId: Long): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
+    fun getSpecificBrewery(
+        @Parameter(description = "ID of the brewery to be retrieved", example = "1")
+        @PathVariable breweryId: Long
+    ): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
         val brewery = this.breweryService.getSpecificBrewery(breweryId)
         return ResponseEntity.ok(this.breweryPresenter.prepareGetBrewery(brewery))
     }
@@ -57,7 +61,11 @@ class BreweryController(private val breweryService: BreweryService, private val 
         ApiResponse(responseCode = "404", description = "Brewery not found")
     ])
     @PutMapping("/{breweryId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateCountry(@PathVariable breweryId: Long, @RequestBody brewery: BreweryUpdateRequestDTO): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
+    fun updateCountry(
+        @Parameter(description = "ID of the brewery to be updated", example = "1")
+        @PathVariable breweryId: Long,
+        @RequestBody brewery: BreweryUpdateRequestDTO
+    ): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
         val updatedBrewery = this.breweryService.updateBrewery(breweryId, brewery)
         return ResponseEntity.ok(this.breweryPresenter.prepareUpdateBrewery(updatedBrewery))
     }
@@ -68,7 +76,10 @@ class BreweryController(private val breweryService: BreweryService, private val 
         ApiResponse(responseCode = "404", description = "Brewery not found")
     ])
     @DeleteMapping("/{breweryId}")
-    fun deleteBrewery(@PathVariable breweryId: Long): ResponseEntity<Void>{
+    fun deleteBrewery(
+        @Parameter(description = "ID of the brewery to be deleted", example = "1")
+        @PathVariable breweryId: Long
+    ): ResponseEntity<Void>{
         this.breweryService.deleteBrewery(breweryId)
         return ResponseEntity.noContent().build()
     }

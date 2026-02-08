@@ -15,9 +15,7 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets
 
@@ -29,10 +27,18 @@ class BeerPresenterAdapter: BeerPresenterPort {
         val outputPage = PageDTO(
             totalPages = input.metadata.totalPages,
             totalElements = input.metadata.totalElements,
-            next = "${uri}?page=${input.metadata.next}&size=${page!!.pageSize}&sort=name",
-            previous = "${uri}?page=${input.metadata.previous}&size=${page.pageSize}&sort=name",
-            first = "${uri}?page=0&size=${page.pageSize}&sort=name",
-            last = "${uri}?page=${input.metadata.last}&size=${page.pageSize}&sort=name",
+            next = input.metadata.current?.let {
+                if (it < input.metadata.totalPages - 1)
+                    linkTo(methodOn(BeerController::class.java).getBeersJson(PageRequest.of(input.metadata.next, page!!.pageSize, page.sort))).toUri().toString()
+                else null
+            },
+            previous = input.metadata.current?.let {
+                if (it > 0)
+                    linkTo(methodOn(BeerController::class.java).getBeersJson(PageRequest.of(input.metadata.previous, page!!.pageSize, page.sort))).toUri().toString()
+                else null
+            },
+            first = linkTo(methodOn(BeerController::class.java).getBeersJson(PageRequest.of(0, page!!.pageSize, page.sort))).toUri().toString(),
+            last = linkTo(methodOn(BeerController::class.java).getBeersJson(PageRequest.of(input.metadata.last, page.pageSize, page.sort))).toUri().toString(),
             current = input.metadata.current
         )
         val beersResponse = input.data.stream().map { beer -> prepareGetBeer(beer) }.toList()
@@ -67,6 +73,9 @@ class BeerPresenterAdapter: BeerPresenterPort {
         this.addSelfLink(beerDto)
         this.addUpdateLink(beerDto)
         this.addDeleteLink(beerDto)
+        this.addBreweryLink(beerDto, beerModel)
+        this.addStyleLink(beerDto, beerModel)
+        this.addCountryLink(beerDto, beerModel)
         return beerDto
     }
 
@@ -75,19 +84,13 @@ class BeerPresenterAdapter: BeerPresenterPort {
     }
 
     private fun addSelfLink(response: ApiIndividualResponseDTO<BeerResponseDTO>) {
-        response.add(linkTo(methodOn(BeerController::class.java)
-            .getSpecificBeer(response.data.id))
+        val selfLink = linkTo(methodOn(BeerController::class.java).getSpecificBeer(response.data.id))
             .withSelfRel()
-            .withMethod("GET"))
-    }
-
-    private fun addGetAllBeersLink(
-        response: ApiIndividualResponseDTO<BeerResponseDTO>,
-        page: Pageable = PageRequest.of(0, 0, Sort.unsorted())) {
-        response.add(linkTo(methodOn(BeerController::class.java)
-            .getBeersJson(page))
-            .withRel("get_all_beers")
-            .withMethod("GET"))
+            .andAffordance(afford(methodOn(BeerController::class.java).updateBeer(response.data.id, BeerUpdateRequestDTO(null, null, null, null, null))))
+            .andAffordance(afford(methodOn(BeerController::class.java).deleteBeer(response.data.id)))
+            .withMethod("GET")
+        
+        response.add(selfLink)
     }
 
     private fun addUpdateLink(response: ApiIndividualResponseDTO<BeerResponseDTO>) {
@@ -102,6 +105,27 @@ class BeerPresenterAdapter: BeerPresenterPort {
             .deleteBeer(response.data.id))
             .withRel("delete_beer")
             .withMethod("DELETE"))
+    }
+
+    private fun addBreweryLink(response: ApiIndividualResponseDTO<BeerResponseDTO>, beerModel: OutputBeerModel) {
+        response.add(linkTo(methodOn(BreweryController::class.java)
+            .getSpecificBrewery(beerModel.breweryId))
+            .withRel("brewery")
+            .withMethod("GET"))
+    }
+
+    private fun addStyleLink(response: ApiIndividualResponseDTO<BeerResponseDTO>, beerModel: OutputBeerModel) {
+        response.add(linkTo(methodOn(StyleController::class.java)
+            .getSpecificStyle(beerModel.styleId))
+            .withRel("style")
+            .withMethod("GET"))
+    }
+
+    private fun addCountryLink(response: ApiIndividualResponseDTO<BeerResponseDTO>, beerModel: OutputBeerModel) {
+        response.add(linkTo(methodOn(CountryController::class.java)
+            .getSpecificCountry(beerModel.countryId))
+            .withRel("country")
+            .withMethod("GET"))
     }
 
     private fun addCreateBeerLink(response: ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>) {

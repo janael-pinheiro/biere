@@ -91,7 +91,7 @@ class BeerControllerIT(
             .expectStatus().is4xxClientError
             .expectBody()
             .jsonPath("$.title").isEqualTo("Validation error")
-            .jsonPath("$.invalid-params[0].reason").isEqualTo("The name of the beer cannot be empty")
+            .jsonPath("$.invalid-params[0].reason").isEqualTo("The name of the beer can not be empty")
     }
 
     @Test

@@ -1,5 +1,10 @@
 package com.biere.catalog.containers.api.dtos
 
 import org.springframework.hateoas.RepresentationModel
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class ApiIndividualResponseDTO<T>(val data: T): RepresentationModel<ApiIndividualResponseDTO<T>>()
+@Schema(description = "Generic wrapper for a single resource response")
+data class ApiIndividualResponseDTO<T>(
+    @Schema(description = "The data object")
+    val data: T
+): RepresentationModel<ApiIndividualResponseDTO<T>>()

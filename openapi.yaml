@@ -1,0 +1,1614 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Biere Catalog API",
+    "description": "API for managing beers, breweries, styles, and countries.",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User management APIs"
+    },
+    {
+      "name": "Countries",
+      "description": "Country management APIs"
+    },
+    {
+      "name": "Beers",
+      "description": "Beer management APIs"
+    },
+    {
+      "name": "Breweries",
+      "description": "Brewery management APIs"
+    },
+    {
+      "name": "Styles",
+      "description": "Style management APIs"
+    }
+  ],
+  "paths": {
+    "/v1/styles/{styleId}": {
+      "get": {
+        "tags": [
+          "Styles"
+        ],
+        "summary": "Get a specific style",
+        "description": "Retrieves details of a specific style by ID.",
+        "operationId": "getSpecificStyle",
+        "parameters": [
+          {
+            "name": "styleId",
+            "in": "path",
+            "description": "ID of the style to be retrieved",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Style not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successfully retrieved style",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Styles"
+        ],
+        "summary": "Update a style",
+        "description": "Updates an existing style by ID.",
+        "operationId": "updateStyle",
+        "parameters": [
+          {
+            "name": "styleId",
+            "in": "path",
+            "description": "ID of the style to be updated",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StyleUpdateRequestDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": "Style not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Style updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Styles"
+        ],
+        "summary": "Delete a style",
+        "description": "Deletes an existing style by ID.",
+        "operationId": "deleteStyle",
+        "parameters": [
+          {
+            "name": "styleId",
+            "in": "path",
+            "description": "ID of the style to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Style not found"
+          },
+          "200": {
+            "description": "Successfully deleted the style"
+          }
+        }
+      }
+    },
+    "/v1/countries/{countryId}": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Get a specific country",
+        "description": "Retrieves details of a specific country by ID.",
+        "operationId": "getSpecificCountry",
+        "parameters": [
+          {
+            "name": "countryId",
+            "in": "path",
+            "description": "ID of the country to be retrieved",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved country",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Country not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Update a country",
+        "description": "Updates an existing country by ID.",
+        "operationId": "updateCountry",
+        "parameters": [
+          {
+            "name": "countryId",
+            "in": "path",
+            "description": "ID of the country to be updated",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountryUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Country updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Country not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Delete a country",
+        "description": "Deletes a country by ID.",
+        "operationId": "deleteCountry",
+        "parameters": [
+          {
+            "name": "countryId",
+            "in": "path",
+            "description": "ID of the country to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Country deleted successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Country not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/breweries/{breweryId}": {
+      "get": {
+        "tags": [
+          "Breweries"
+        ],
+        "summary": "Get a specific brewery",
+        "description": "Retrieves details of a specific brewery by ID.",
+        "operationId": "getSpecificBrewery",
+        "parameters": [
+          {
+            "name": "breweryId",
+            "in": "path",
+            "description": "ID of the brewery to be retrieved",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved brewery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brewery not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Breweries"
+        ],
+        "summary": "Update a brewery",
+        "description": "Updates an existing brewery by ID.",
+        "operationId": "updateCountry_1",
+        "parameters": [
+          {
+            "name": "breweryId",
+            "in": "path",
+            "description": "ID of the brewery to be updated",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BreweryUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Brewery updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Brewery not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Breweries"
+        ],
+        "summary": "Delete a brewery",
+        "description": "Deletes an existing brewery based on the ID.",
+        "operationId": "deleteBrewery",
+        "parameters": [
+          {
+            "name": "breweryId",
+            "in": "path",
+            "description": "ID of the brewery to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully deleted"
+          },
+          "404": {
+            "description": "Brewery not found"
+          }
+        }
+      }
+    },
+    "/v1/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Register a new user",
+        "description": "Registers a new user account.",
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegistrationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/refresh-token": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Refresh Token",
+        "description": "Refreshes the authentication token.",
+        "operationId": "refreshToken",
+        "responses": {
+          "401": {
+            "description": "Invalid or expired token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponseDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successfully refreshed token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Login",
+        "description": "Authenticates a user and returns a token.",
+        "operationId": "getToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponseDTO"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/styles": {
+      "get": {
+        "tags": [
+          "Styles"
+        ],
+        "summary": "Get all styles",
+        "description": "Retrieves a list of all available beer styles.",
+        "operationId": "getStyles",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Styles"
+        ],
+        "summary": "Register a new style",
+        "description": "Creates a new beer style.",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StyleRegistrationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Style created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/countries": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Get all countries",
+        "description": "Retrieves a list of all countries.",
+        "operationId": "getCountries",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Register a new country",
+        "description": "Creates a new country.",
+        "operationId": "registerCountry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountryRegistrationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Country created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/breweries": {
+      "get": {
+        "tags": [
+          "Breweries"
+        ],
+        "summary": "Get all breweries",
+        "description": "Retrieves a list of all breweries.",
+        "operationId": "getBreweries",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Breweries"
+        ],
+        "summary": "Register a new brewery",
+        "description": "Creates a new brewery.",
+        "operationId": "register_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BreweryRegistrationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Brewery created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/beers": {
+      "get": {
+        "tags": [
+          "Beers"
+        ],
+        "summary": "Get all beers (JSON)",
+        "description": "Retrieves a paginated list of beers in JSON format.",
+        "operationId": "getBeersCsv",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Pagination information",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Beers"
+        ],
+        "summary": "Register a new beer",
+        "description": "Creates a new beer record.",
+        "operationId": "register_2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeerRegistrationDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Beer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/beers/{beerId}": {
+      "get": {
+        "tags": [
+          "Beers"
+        ],
+        "summary": "Get a specific beer",
+        "description": "Retrieves details of a specific beer by ID.",
+        "operationId": "getSpecificBeer",
+        "parameters": [
+          {
+            "name": "beerId",
+            "in": "path",
+            "description": "ID of the beer to be retrieved",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Beer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successfully retrieved beer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Beers"
+        ],
+        "summary": "Delete a beer",
+        "description": "Deletes a beer by ID.",
+        "operationId": "deleteBeer",
+        "parameters": [
+          {
+            "name": "beerId",
+            "in": "path",
+            "description": "ID of the beer to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Beer not found"
+          },
+          "204": {
+            "description": "Beer deleted successfully"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Beers"
+        ],
+        "summary": "Update a beer",
+        "description": "Updates an existing beer by ID.",
+        "operationId": "updateBeer",
+        "parameters": [
+          {
+            "name": "beerId",
+            "in": "path",
+            "description": "ID of the beer to be updated",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeerUpdateRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "Beer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Beer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/{userId}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Remove a user",
+        "description": "Removes a user by ID.",
+        "operationId": "removeUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the user to be removed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User removed successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StyleUpdateRequestDTO": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "New name of the style",
+            "example": "Stout"
+          }
+        },
+        "description": "DTO for style update request"
+      },
+      "ApiIndividualResponseDTOStyleResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/StyleResponseDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a single resource response"
+      },
+      "Links": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Link"
+        }
+      },
+      "StyleResponseDTO": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the style",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the style",
+            "example": "IPA"
+          }
+        },
+        "description": "DTO for style response data"
+      },
+      "CountryUpdateRequestDTO": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "New name of the country",
+            "example": "Netherlands"
+          }
+        },
+        "description": "DTO for country update request"
+      },
+      "ApiIndividualResponseDTOCountryResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CountryResponseDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a single resource response"
+      },
+      "CountryResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the country",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the country",
+            "example": "Netherlands"
+          }
+        },
+        "description": "DTO for country response data"
+      },
+      "BreweryUpdateRequestDTO": {
+        "required": [
+          "country_id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "New name of the brewery",
+            "example": "Heineken International"
+          },
+          "country_id": {
+            "type": "integer",
+            "description": "New ID of the country",
+            "format": "int64",
+            "example": 1
+          }
+        },
+        "description": "DTO for brewery update request"
+      },
+      "ApiIndividualResponseDTOBreweryResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/BreweryResponseDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a single resource response"
+      },
+      "BreweryResponseDTO": {
+        "required": [
+          "country",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the brewery",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the brewery",
+            "example": "Heineken Brewery"
+          },
+          "country": {
+            "$ref": "#/components/schemas/CountryResponseDTO"
+          }
+        },
+        "description": "DTO for brewery response data"
+      },
+      "UserRegistrationDTO": {
+        "required": [
+          "email",
+          "name",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Full name of the user",
+            "example": "John Doe"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Email address of the user",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Password for the user",
+            "format": "password",
+            "example": "securePassword123"
+          }
+        },
+        "description": "DTO for user registration request"
+      },
+      "TokenResponseDTO": {
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token",
+            "example": "eyJhbGciOiJIUzI1NiJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "JWT refresh token",
+            "example": "eyJhbGciOiJIUzI1NiJ9..."
+          }
+        },
+        "description": "DTO for authentication response containing tokens"
+      },
+      "TokenRequestDTO": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "format": "password",
+            "example": "securePassword123"
+          }
+        },
+        "description": "DTO for authentication request"
+      },
+      "StyleRegistrationDTO": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name of the style",
+            "example": "IPA"
+          }
+        },
+        "description": "DTO for style registration request"
+      },
+      "CountryRegistrationDTO": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Name of the country",
+            "example": "Netherlands"
+          }
+        },
+        "description": "DTO for country registration request"
+      },
+      "BreweryRegistrationDTO": {
+        "required": [
+          "country_id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Name of the brewery",
+            "example": "Heineken Brewery"
+          },
+          "country_id": {
+            "type": "integer",
+            "description": "ID of the country",
+            "format": "int64",
+            "example": 1
+          }
+        },
+        "description": "DTO for brewery registration request"
+      },
+      "BeerRegistrationDTO": {
+        "required": [
+          "alcohol_content",
+          "brewery_id",
+          "name",
+          "style_id",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Name of the beer",
+            "example": "Heineken"
+          },
+          "alcohol_content": {
+            "maximum": 100,
+            "minimum": 0.0,
+            "type": "number",
+            "description": "Alcohol content percentage",
+            "format": "float",
+            "example": 5.0
+          },
+          "brewery_id": {
+            "type": "integer",
+            "description": "ID of the brewery",
+            "format": "int64",
+            "example": 1
+          },
+          "style_id": {
+            "type": "integer",
+            "description": "ID of the beer style",
+            "format": "int64",
+            "example": 1
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year of production",
+            "format": "int64",
+            "example": 2023
+          }
+        },
+        "description": "DTO for beer registration request"
+      },
+      "ApiIndividualResponseDTOBeerResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/BeerResponseDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a single resource response"
+      },
+      "BeerResponseDTO": {
+        "required": [
+          "alcohol_content",
+          "brewery",
+          "country_name",
+          "id",
+          "name",
+          "style",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the beer",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the beer",
+            "example": "Heineken"
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Country of origin",
+            "example": "Netherlands"
+          },
+          "alcohol_content": {
+            "type": "number",
+            "description": "Alcohol content percentage",
+            "format": "float",
+            "example": 5.0
+          },
+          "brewery": {
+            "type": "string",
+            "description": "Name of the brewery",
+            "example": "Heineken Brewery"
+          },
+          "style": {
+            "type": "string",
+            "description": "Style of the beer",
+            "example": "Lager"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year of production",
+            "format": "int64",
+            "example": 2023
+          }
+        },
+        "description": "DTO for beer response data"
+      },
+      "BeerUpdateRequestDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "New name of the beer",
+            "example": "Heineken Silver"
+          },
+          "alcohol_content": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "type": "number",
+            "description": "New alcohol content percentage",
+            "format": "float",
+            "example": 4.0
+          },
+          "brewery_id": {
+            "type": "integer",
+            "description": "New ID of the brewery",
+            "format": "int64",
+            "example": 1
+          },
+          "style_id": {
+            "type": "integer",
+            "description": "New ID of the beer style",
+            "format": "int64",
+            "example": 1
+          },
+          "year": {
+            "type": "integer",
+            "description": "New year of production",
+            "format": "int64",
+            "example": 2024
+          }
+        },
+        "description": "DTO for beer update request (partial update)"
+      },
+      "ApiCollectionResponseDTOListApiIndividualResponseDTOStyleResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of data objects",
+            "items": {
+              "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a collection resource response"
+      },
+      "PageDTO": {
+        "required": [
+          "total_elements",
+          "total_pages"
+        ],
+        "type": "object",
+        "properties": {
+          "total_elements": {
+            "type": "integer",
+            "description": "Total number of elements across all pages",
+            "format": "int64",
+            "example": 100
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32",
+            "example": 10
+          },
+          "first": {
+            "type": "string",
+            "description": "Link to the first page",
+            "example": "http://api.example.com/v1/beers?page\u003d0"
+          },
+          "last": {
+            "type": "string",
+            "description": "Link to the last page",
+            "example": "http://api.example.com/v1/beers?page\u003d9"
+          },
+          "next": {
+            "type": "string",
+            "description": "Link to the next page",
+            "example": "http://api.example.com/v1/beers?page\u003d2"
+          },
+          "previous": {
+            "type": "string",
+            "description": "Link to the previous page",
+            "example": "http://api.example.com/v1/beers?page\u003d0"
+          },
+          "current": {
+            "type": "integer",
+            "description": "Current page number (zero-indexed)",
+            "format": "int32",
+            "example": 1
+          }
+        },
+        "description": "Pagination information metadata"
+      },
+      "ApiCollectionResponseDTOListApiIndividualResponseDTOCountryResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of data objects",
+            "items": {
+              "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a collection resource response"
+      },
+      "ApiCollectionResponseDTOListApiIndividualResponseDTOBreweryResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of data objects",
+            "items": {
+              "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a collection resource response"
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "hreflang": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "deprecation": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "templated": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

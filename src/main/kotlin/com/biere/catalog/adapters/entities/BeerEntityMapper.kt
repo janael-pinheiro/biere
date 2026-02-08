@@ -19,9 +19,12 @@ interface BeerEntityMapper {
                 id = input.id ?: 0,
                 name = input.name,
                 countryName = input.brewery.country.name,
+                countryId = input.brewery.country.id ?: 0,
                 alcoholContent = input.alcoholContent,
                 brewery = input.brewery.name,
+                breweryId = input.brewery.id ?: 0,
                 style = input.style.name,
+                styleId = input.style.id ?: 0,
                 year = input.year)
         }
     }

@@ -1,12 +1,14 @@
 package com.biere.catalog.containers.api.presenters
 
 import com.biere.catalog.containers.api.controllers.brewery.BreweryController
+import com.biere.catalog.containers.api.controllers.country.CountryController
 import com.biere.catalog.containers.api.dtos.*
 import com.biere.catalog.containers.api.helpers.withMethod
 import com.biere.catalog.containers.api.mappers.BreweryMapper
 import com.biere.catalog.core.models.BreweryModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford
 
 class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()) {
     fun prepareRegisterBrewery(breweryModel: BreweryModel): ApiIndividualResponseDTO<BreweryResponseDTO> {
@@ -14,6 +16,7 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
         this.addSelfLink(outputBrewery)
         this.addUpdateLink(outputBrewery)
         this.addDeleteLink(outputBrewery)
+        this.addCountryLink(outputBrewery, breweryModel)
         this.addGetAllBreweriesLink(outputBrewery)
         return outputBrewery
     }
@@ -23,6 +26,7 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
         this.addSelfLink(breweryDto)
         this.addUpdateLink(breweryDto)
         this.addDeleteLink(breweryDto)
+        this.addCountryLink(breweryDto, breweryModel)
         return breweryDto
     }
 
@@ -38,10 +42,13 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
     }
 
     private fun addSelfLink(response: ApiIndividualResponseDTO<BreweryResponseDTO>) {
-        response.add(linkTo(methodOn(BreweryController::class.java)
-            .getSpecificBrewery(response.data.id!!))
+        val selfLink = linkTo(methodOn(BreweryController::class.java).getSpecificBrewery(response.data.id!!))
             .withSelfRel()
-            .withMethod("GET"))
+            .andAffordance(afford(methodOn(BreweryController::class.java).updateCountry(response.data.id, BreweryUpdateRequestDTO("", 0))))
+            .andAffordance(afford(methodOn(BreweryController::class.java).deleteBrewery(response.data.id)))
+            .withMethod("GET")
+            
+        response.add(selfLink)
     }
 
     private fun addGetAllBreweriesLink(response: ApiIndividualResponseDTO<BreweryResponseDTO>) {
@@ -63,6 +70,13 @@ class BreweryPresenterAdapter(val breweryMapper: BreweryMapper = BreweryMapper()
             .deleteBrewery(response.data.id!!))
             .withRel("delete_brewery")
             .withMethod("DELETE"))
+    }
+
+    private fun addCountryLink(response: ApiIndividualResponseDTO<BreweryResponseDTO>, breweryModel: BreweryModel) {
+        response.add(linkTo(methodOn(CountryController::class.java)
+            .getSpecificCountry(breweryModel.country.id))
+            .withRel("country")
+            .withMethod("GET"))
     }
 
     private fun addCreateBreweryLink(response: ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>>) {

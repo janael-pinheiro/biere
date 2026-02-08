@@ -18,7 +18,9 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.Parameter
 import jakarta.validation.Valid
+
 import org.springframework.hateoas.MediaTypes
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
@@ -38,12 +40,16 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         return ResponseEntity.created(URI("")).body(response)
     }
 
+
     @Operation(summary = "Get all beers (JSON)", description = "Retrieves a paginated list of beers in JSON format.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
-    fun getBeersJson(@PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable?): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>>{
+    fun getBeersJson(
+        @Parameter(description = "Pagination information")
+        @PageableDefault(page = 0, size = 10, sort = ["name"]) page: Pageable?
+    ): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BeerResponseDTO>>>>{
         val beers = this.beerService.getBeers(PageRequest(number = page!!.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
         val uri = ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString()
         return ResponseEntity.ok(beerPresenter.prepareJsonData(page, beers, uri))
@@ -54,7 +60,10 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "200", description = "Successfully retrieved CSV file")
     ])
     @GetMapping(produces = ["text/csv"])
-    fun getBeersCsv(@PageableDefault(page = 0, size = 100, sort = ["name"]) page: Pageable): ResponseEntity<ByteArrayResource>{
+    fun getBeersCsv(
+        @Parameter(description = "Pagination information")
+        @PageableDefault(page = 0, size = 100, sort = ["name"]) page: Pageable
+    ): ResponseEntity<ByteArrayResource>{
         val beers = this.beerService.getBeers(PageRequest(number = page.pageNumber, size = page.pageSize, sort = page.sort.getOrderFor("name")?.property.toString()))
         return ResponseEntity
             .ok()
@@ -69,7 +78,10 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "404", description = "Beer not found")
     ])
     @GetMapping("/{beerId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getSpecificBeer(@PathVariable beerId: Long): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>>{
+    fun getSpecificBeer(
+        @Parameter(description = "ID of the beer to be retrieved", example = "1")
+        @PathVariable beerId: Long
+    ): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>>{
         val beer = this.beerService.getSpecificBeer(beerId)
         return ResponseEntity.ok(beerPresenter.prepareGetBeer(beer))
     }
@@ -80,7 +92,11 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "404", description = "Beer not found")
     ])
     @PatchMapping("/{beerId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun updateBeer(@PathVariable beerId: Long, @RequestBody beerUpdateRequest: BeerUpdateRequestDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>>{
+    fun updateBeer(
+        @Parameter(description = "ID of the beer to be updated", example = "1")
+        @PathVariable beerId: Long,
+        @RequestBody beerUpdateRequest: BeerUpdateRequestDTO
+    ): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>>{
         val beer = this.beerService.updateBeer(beerId, UpdateBeerModel(
             name = beerUpdateRequest.name,
             alcoholContent = beerUpdateRequest.alcoholContent,
@@ -96,7 +112,10 @@ class BeerController(private val beerService: BeerService, private val beerPrese
         ApiResponse(responseCode = "404", description = "Beer not found")
     ])
     @DeleteMapping("/{beerId}")
-    fun deleteBeer(@PathVariable beerId: Long): ResponseEntity<Void> {
+    fun deleteBeer(
+        @Parameter(description = "ID of the beer to be deleted", example = "1")
+        @PathVariable beerId: Long
+    ): ResponseEntity<Void> {
         beerService.deleteBeer(beerId)
         return ResponseEntity.noContent().build()
     }

@@ -14,7 +14,6 @@ import com.biere.catalog.core.models.StyleResponseModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn
-import org.springframework.hateoas.server.mvc.afford
 
 class StylePresenterAdapter(private val styleMapper: StyleMapper = StyleMapper()) {
     fun prepareGetStyle(styleModel: StyleResponseModel): ApiIndividualResponseDTO<StyleResponseDTO> {
@@ -45,10 +44,13 @@ class StylePresenterAdapter(private val styleMapper: StyleMapper = StyleMapper()
         return styleResponse
     }
     private fun addSelfLink(response: ApiIndividualResponseDTO<StyleResponseDTO>) {
-        response.add(linkTo(methodOn(StyleController::class.java)
-            .getSpecificStyle(response.data.id))
+        val selfLink = linkTo(methodOn(StyleController::class.java).getSpecificStyle(response.data.id))
             .withSelfRel()
-            .withMethod("GET"))
+            .andAffordance(afford(methodOn(StyleController::class.java).updateStyle(response.data.id, StyleUpdateRequestDTO(""))))
+            .andAffordance(afford(methodOn(StyleController::class.java).deleteStyle(response.data.id)))
+            .withMethod("GET")
+            
+        response.add(selfLink)
     }
 
     private fun addUpdateSelfLink(response: ApiIndividualResponseDTO<StyleResponseDTO>) {
