@@ -1,0 +1,1 @@
+ALTER TABLE beers ADD CONSTRAINT unique_name_style UNIQUE(name, style_id)
