@@ -1,0 +1,10 @@
+package com.biere.catalog.infrastructure.adapter.output.persistence.repository
+
+import com.biere.catalog.infrastructure.adapter.output.persistence.entity.BreweryEntity
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
+
+@Repository
+interface BreweryRepository: JpaRepository<BreweryEntity, Long> {
+    fun existsByName(name: String): Boolean
+}
