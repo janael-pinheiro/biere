@@ -14,7 +14,7 @@ class BreweryOutputAdapter(
 ) : BreweryOutputPort {
 
     override fun save(name: String, countryId: Long): BreweryModel {
-        val country = countryRepository.findById(countryId).orElseThrow { NotFoundException("Country $countryId not found.") }
+        val country = countryRepository.findById(countryId).orElseThrow { NotFoundException(message = "Country $countryId not found.", remediation = "You need to check if a country with that id has already been registered or correct the country's id.") }
         val brewery = breweryRepository.save(BreweryEntity(name = name, country = country))
         return mapToModel(brewery)
     }
@@ -24,13 +24,13 @@ class BreweryOutputAdapter(
     }
 
     override fun findById(id: Long): BreweryModel {
-        val brewery = breweryRepository.findById(id).orElseThrow { NotFoundException("Brewery $id not found.") }
+        val brewery = breweryRepository.findById(id).orElseThrow { NotFoundException(message = "Brewery $id not found.", remediation = "You need to check if a brewery with that id has already been registered or correct the brewery's id.") }
         return mapToModel(brewery)
     }
 
     override fun update(id: Long, name: String, countryId: Long): BreweryModel {
-        val brewery = breweryRepository.findById(id).orElseThrow { NotFoundException("Brewery $id not found.") }
-        val country = countryRepository.findById(countryId).orElseThrow { NotFoundException("Country $countryId not found.") }
+        val brewery = breweryRepository.findById(id).orElseThrow { NotFoundException(message = "Brewery $id not found.", remediation = "You need to check if a brewery with that id has already been registered or correct the brewery's id.") }
+        val country = countryRepository.findById(countryId).orElseThrow { NotFoundException(message = "Country $countryId not found.", remediation = "You need to check if a country with that id has already been registered or correct the country's id.") }
         brewery.name = name
         brewery.country = country
         return mapToModel(breweryRepository.save(brewery))

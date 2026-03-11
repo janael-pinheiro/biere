@@ -1,5 +1,6 @@
 package com.biere.catalog.infrastructure.configuration
 
+import com.biere.catalog.domain.exception.RateLimitException
 import org.springframework.http.HttpStatus
 import io.github.bucket4j.Bandwidth
 import io.github.bucket4j.Bucket
@@ -50,9 +51,6 @@ class RateLimitInterceptor(
         }
         val waitForRefill = probe.nanosToWaitForRefill / 1_000_000_000
         response.addHeader("X-Rate-Limit-Retry-After-Seconds", waitForRefill.toString())
-        response.sendError(
-            HttpStatus.TOO_MANY_REQUESTS.value(),
-            "You have exhausted your API Request Quota")
-        return false
+        throw RateLimitException("You have exhausted your API Request Quota")
     }
 }

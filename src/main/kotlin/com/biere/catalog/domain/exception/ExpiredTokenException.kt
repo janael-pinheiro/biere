@@ -1,4 +1,4 @@
 package com.biere.catalog.domain.exception
 
-class ExpiredTokenException(message: String): Exception(message) {
+class ExpiredTokenException(message: String, val remediation: String): Exception(message) {
 }

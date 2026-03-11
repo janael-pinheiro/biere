@@ -43,7 +43,7 @@ class RateLimitIT(
             .expectStatus().isEqualTo(429)
             .expectHeader().exists("X-Rate-Limit-Retry-After-Seconds")
             .expectBody()
-            .jsonPath("$.message").isEqualTo("You have exhausted your API Request Quota")
+            .jsonPath("$.detail").isEqualTo("You have exhausted your API Request Quota")
     }
 
     @Test

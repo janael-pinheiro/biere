@@ -1,4 +1,4 @@
 package com.biere.catalog.domain.exception
 
-class NotFoundException(message: String): Exception(message) {
+class NotFoundException(message: String, val remediation: String): Exception(message) {
 }

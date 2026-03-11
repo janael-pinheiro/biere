@@ -5,13 +5,16 @@ import com.biere.catalog.domain.port.input.BreweryUseCase
 import com.biere.catalog.domain.model.BreweryModel
 import com.biere.catalog.domain.exception.ConflictException
 import com.biere.catalog.domain.exception.NotFoundException
+import com.biere.catalog.domain.exception.RemediationMessage
 import org.springframework.stereotype.Service
 
 @Service
 class BreweryService(private val breweryOutputPort: BreweryOutputPort) : BreweryUseCase {
     override fun register(name: String, countryId: Long): BreweryModel {
         if (breweryOutputPort.existsByName(name)){
-            throw ConflictException("The name ${name} already exists.")
+            throw ConflictException(message = "The name ${name} already exists.",
+                remediation = RemediationMessage.BREWERY_NAME_CONFLICT_REMEDIATION.message
+            )
         }
         return breweryOutputPort.save(name, countryId)
     }
@@ -26,14 +29,14 @@ class BreweryService(private val breweryOutputPort: BreweryOutputPort) : Brewery
 
     override fun updateBrewery(breweryId: Long, name: String, countryId: Long): BreweryModel {
         if (!breweryOutputPort.existsById(breweryId)) {
-            throw NotFoundException("Brewery not found.")
+            throw NotFoundException(message = "Brewery not found.", remediation = RemediationMessage.BREWERY_NOT_FOUND_REMEDIATION.message)
         }
         return breweryOutputPort.update(breweryId, name, countryId)
     }
 
     override fun deleteBrewery(breweryId: Long) {
         if (!breweryOutputPort.existsById(breweryId)){
-            throw NotFoundException("Brewery not found.")
+            throw NotFoundException(message = "Brewery not found.", remediation = RemediationMessage.BREWERY_NOT_FOUND_REMEDIATION.message)
         }
         breweryOutputPort.delete(breweryId)
     }

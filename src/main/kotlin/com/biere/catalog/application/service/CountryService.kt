@@ -5,13 +5,16 @@ import com.biere.catalog.domain.port.input.CountryUseCase
 import com.biere.catalog.domain.model.CountryModel
 import com.biere.catalog.domain.exception.ConflictException
 import com.biere.catalog.domain.exception.NotFoundException
+import com.biere.catalog.domain.exception.RemediationMessage
 import org.springframework.stereotype.Service
 
 @Service
 class CountryService(private val countryOutputPort: CountryOutputPort) : CountryUseCase {
     override fun register(name: String): CountryModel {
         if (countryOutputPort.existsByName(name)) {
-            throw ConflictException("The name ${name} already exists.")
+            throw ConflictException(message = "The name ${name} already exists.",
+                remediation = RemediationMessage.COUNTRY_NAME_CONFLICT_REMEDIATION.message
+            )
         }
         return countryOutputPort.save(name)
     }
@@ -26,7 +29,7 @@ class CountryService(private val countryOutputPort: CountryOutputPort) : Country
 
     override fun deleteCountry(countryId: Long) {
         if (!countryOutputPort.existsById(countryId)) {
-            throw NotFoundException("Country not found.")
+            throw NotFoundException(message = "Country not found.", remediation = RemediationMessage.COUNTRY_NOT_FOUND_REMEDIATION.message)
         }
         countryOutputPort.delete(countryId)
     }
@@ -35,7 +38,7 @@ class CountryService(private val countryOutputPort: CountryOutputPort) : Country
         countryId: Long,
         name: String): CountryModel {
         if (!countryOutputPort.existsById(countryId)) {
-            throw NotFoundException("Country not found.")
+            throw NotFoundException(message = "Country not found.", remediation = RemediationMessage.COUNTRY_NOT_FOUND_REMEDIATION.message)
         }
         return countryOutputPort.update(countryId, name)
     }

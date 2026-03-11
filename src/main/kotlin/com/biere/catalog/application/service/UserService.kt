@@ -7,11 +7,11 @@ import com.biere.catalog.domain.model.InputUser
 import com.biere.catalog.domain.exception.NotAuthorizedException
 import com.biere.catalog.domain.exception.InvalidTokenException
 import com.biere.catalog.domain.exception.ExpiredTokenException
+import com.biere.catalog.domain.exception.RemediationMessage
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
-import io.jsonwebtoken.io.Encoders
 import io.jsonwebtoken.security.Keys
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,10 +32,9 @@ class UserService(
     private val signingKey: Key by lazy {
         Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret))
     }
-
     override fun generateToken(email: String, password: String): TokenModel {
         if(!isUserValid(email, password)){
-            throw NotAuthorizedException("E-mail or password incorrect.")
+            throw NotAuthorizedException(message = "E-mail or password incorrect.", remediation = RemediationMessage.EMAIL_PASSWORD_REMEDIATION.message)
         }
         val now = Date()
         val accessToken = createToken(email, now.time + accessTokenExpiration, now)
@@ -82,11 +81,11 @@ class UserService(
         try {
             parseToken(token)
         } catch (_: io.jsonwebtoken.ExpiredJwtException){
-            throw ExpiredTokenException("Expired token.")
+            throw ExpiredTokenException(message = "Expired token.", remediation = RemediationMessage.TOKEN_REMEDIATION.message)
         } catch (_: InvalidTokenException){
-            throw InvalidTokenException("Invalid token.")
+            throw InvalidTokenException(message = "Invalid token.", remediation = RemediationMessage.TOKEN_REMEDIATION.message)
         } catch (_: Exception) {
-            throw NotAuthorizedException("Invalid token.")
+            throw NotAuthorizedException(message = "Invalid token.", remediation = RemediationMessage.TOKEN_REMEDIATION.message)
         }
     }
 

@@ -29,7 +29,7 @@ class AuthenticationFilter(
         try {
             val header: String? = request.getHeader("Authorization")
             if (header == null || !header.contains("Bearer ")){
-                throw NotAuthorizedException("Token not provided")
+                throw NotAuthorizedException(message = "Token not provided", remediation = "You must include the token in the authorization header.")
             }
             val token: String = header.split("Bearer ")[1]
             userService.isTokenValid(token)

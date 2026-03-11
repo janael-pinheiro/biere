@@ -4,6 +4,7 @@ import com.biere.catalog.infrastructure.adapter.output.persistence.entity.BeerEn
 import com.biere.catalog.domain.port.output.BeerOutputPort
 import com.biere.catalog.domain.exception.ConflictException
 import com.biere.catalog.domain.exception.NotFoundException
+import com.biere.catalog.domain.exception.RemediationMessage
 import com.biere.catalog.domain.model.*
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
@@ -28,10 +29,10 @@ class BeerOutputAdapter(
 
     override fun saveBeer(inputBeer: InputBeerModel): OutputBeerModel {
         if (beerRepository.existsByName(inputBeer.name)) {
-            throw ConflictException("Beer with name ${inputBeer.name} already exists.")
+            throw ConflictException(message = "Beer with name ${inputBeer.name} already exists.", remediation = RemediationMessage.BEER_NAME_CONFLICT_REMEDIATION.message)
         }
-        val brewery = breweryRepository.findById(inputBeer.breweryId).orElseThrow { NotFoundException("Brewery with id ${inputBeer.breweryId} does not exist.") }
-        val style = styleRepository.findById(inputBeer.styleId).orElseThrow { NotFoundException("Style with id ${inputBeer.styleId} does not exist.") }
+        val brewery = breweryRepository.findById(inputBeer.breweryId).orElseThrow { NotFoundException(message = "Brewery with id ${inputBeer.breweryId} does not exist.", remediation = RemediationMessage.BREWERY_NOT_FOUND_REMEDIATION.message) }
+        val style = styleRepository.findById(inputBeer.styleId).orElseThrow { NotFoundException(message = "Style with id ${inputBeer.styleId} does not exist.", remediation = RemediationMessage.STYLE_NOT_FOUND_REMEDIATION.message) }
         val beer = BeerEntityMapper.mapToEntity(inputBeer, brewery, style)
         return BeerEntityMapper.mapToOutputBeer(beerRepository.save(beer))
     }
@@ -39,7 +40,7 @@ class BeerOutputAdapter(
     override fun findSpecificBeer(beerId: Long): OutputBeerModel {
         val optionalBeer = beerRepository.findById(beerId)
         if(optionalBeer.isEmpty){
-            throw NotFoundException("Beer not found.")
+            throw NotFoundException(message = "Beer not found.", remediation = RemediationMessage.BEER_NOT_FOUND_REMEDIATION.message)
         }
         return BeerEntityMapper.mapToOutputBeer(optionalBeer.get())
     }
@@ -47,7 +48,7 @@ class BeerOutputAdapter(
     override fun updateBeer(beerId: Long, updatedBeer: UpdateBeerModel): OutputBeerModel {
         val optionalBeer = beerRepository.findById(beerId)
         if(optionalBeer.isEmpty){
-            throw NotFoundException("Beer not found.")
+            throw NotFoundException(message = "Beer not found.", remediation = RemediationMessage.BEER_NOT_FOUND_REMEDIATION.message)
         }
 
         val beer = optionalBeer.get()
@@ -57,7 +58,7 @@ class BeerOutputAdapter(
 
         if (Objects.nonNull(updatedBeer.breweryId)) {
             val brewery = breweryRepository.findById(updatedBeer.breweryId!!)
-                .orElseThrow{ NotFoundException("Brewery not found.") }
+                .orElseThrow{ NotFoundException(message = "Brewery not found.", remediation = RemediationMessage.BREWERY_NOT_FOUND_REMEDIATION.message) }
             beer.brewery = brewery ?: beer.brewery
         }
 
@@ -66,7 +67,7 @@ class BeerOutputAdapter(
 
     override fun deleteBeer(beerId: Long) {
         if (!this.beerRepository.existsById(beerId)){
-            throw NotFoundException("Beer not found.")
+            throw NotFoundException(message = "Beer not found.", remediation = RemediationMessage.BEER_NOT_FOUND_REMEDIATION.message)
         }
         beerRepository.deleteById(beerId)
     }
