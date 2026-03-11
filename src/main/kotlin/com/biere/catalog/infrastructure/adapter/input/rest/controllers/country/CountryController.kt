@@ -20,10 +20,11 @@ import com.biere.catalog.domain.port.output.CountryPresenterPort
 @RequestMapping("/v1/countries")
 @Tag(name = "Countries", description = "Country management APIs")
 class CountryController(private val countryService: CountryUseCase, private val countryPresenter: CountryPresenterPort) {
-    @Operation(summary = "Register a new country", description = "Creates a new country.")
+    @Operation(summary = "Register a new country", 
+        description = "Creates a new country. Countries are base resources. You might need to create a country before registering a brewery if it's not already in the system.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Country created successfully"),
-        ApiResponse(responseCode = "400", description = "Invalid input")
+        ApiResponse(responseCode = "400", description = "Invalid input. Check the 'remediation' field for instructions on how to proceed.")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun registerCountry(@Valid @RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
@@ -33,7 +34,8 @@ class CountryController(private val countryService: CountryUseCase, private val 
             .body(countryPresenter.prepareCreateCountry(country));
     }
 
-    @Operation(summary = "Get all countries", description = "Retrieves a list of all countries.")
+    @Operation(summary = "Get all countries", 
+        description = "Retrieves all countries. Use this to find the correct 'country_id' when managing breweries. Cache this list if you are doing multiple operations to save resources.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])

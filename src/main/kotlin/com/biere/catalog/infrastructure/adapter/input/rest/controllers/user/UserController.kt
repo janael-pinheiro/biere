@@ -21,10 +21,11 @@ import io.swagger.v3.oas.annotations.Parameter
 @Tag(name = "Users", description = "User management APIs")
 class UserController(
     val userService: UserUseCase) {
-    @Operation(summary = "Login", description = "Authenticates a user and returns a token.")
+    @Operation(summary = "Login", 
+        description = "Authenticates a user. This is the first step for any state-changing operation. If successful, you will receive an 'access_token' to be used in the 'Authorization: Bearer' header of subsequent requests.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully authenticated"),
-        ApiResponse(responseCode = "401", description = "Invalid credentials")
+        ApiResponse(responseCode = "401", description = "Invalid credentials. If this fails, do not retry automatically without ensuring credentials are correct.")
     ])
     @PostMapping("login", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getToken(@RequestBody loginRequest: TokenRequestDTO): ResponseEntity<TokenResponseDTO> {
@@ -32,10 +33,11 @@ class UserController(
         return ResponseEntity.ok(TokenResponseDTO(accessToken = token.accessToken, refreshToken = token.refreshToken));
     }
 
-    @Operation(summary = "Refresh Token", description = "Refreshes the authentication token.")
+    @Operation(summary = "Refresh Token", 
+        description = "Refreshes the authentication session. Use this when the 'access_token' expires (indicated by a 401 response with 'invalid-token' type). Provides a new access/refresh token pair without requiring full login.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully refreshed token"),
-        ApiResponse(responseCode = "401", description = "Invalid or expired token")
+        ApiResponse(responseCode = "401", description = "Invalid or expired token. If refreshing fails, you must re-authenticate via 'POST /v1/users/login'.")
     ])
     @PostMapping("refresh-token", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun refreshToken(@RequestHeader headers: HttpHeaders): ResponseEntity<TokenResponseDTO>{

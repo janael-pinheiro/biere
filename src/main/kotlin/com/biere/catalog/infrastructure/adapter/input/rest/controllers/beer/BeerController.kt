@@ -30,10 +30,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @Tag(name = "Beers", description = "Beer management APIs")
 @SecurityRequirement(name = "Bearer Authentication")
 class BeerController(private val beerService: BeerUseCase, private val beerPresenter: BeerPresenterPort){
-    @Operation(summary = "Register a new beer", description = "Creates a new beer record.")
+    @Operation(summary = "Register a new beer", 
+        description = "Creates a new beer record. Before calling this, ensure you have valid 'brewery_id' and 'style_id'. These must be discovered via 'GET /v1/breweries' and 'GET /v1/styles' respectively. Do not guess IDs.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Beer created successfully"),
-        ApiResponse(responseCode = "400", description = "Invalid input")
+        ApiResponse(responseCode = "400", description = "Invalid input. Check 'invalid-params' in the response for prescriptive correction.")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, "application/hal+json"])
     fun register(@Valid @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
@@ -43,7 +44,8 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
     }
 
 
-    @Operation(summary = "Get all beers (JSON)", description = "Retrieves a paginated list of beers in JSON format.")
+    @Operation(summary = "Get all beers (JSON)", 
+        description = "Retrieves a paginated list of beers. Use the 'page' parameter to navigate. For autonomous navigation, prefer using the HATEOAS links provided in the 'page' metadata (first, last, next, previous).")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
@@ -74,10 +76,11 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
             .body(beerPresenter.prepareCsvData(beers))
     }
 
-    @Operation(summary = "Get a specific beer", description = "Retrieves details of a specific beer by ID.")
+    @Operation(summary = "Get a specific beer", 
+        description = "Retrieves details of a specific beer. Use this to verify the current state before performing an update or delete operation.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved beer"),
-        ApiResponse(responseCode = "404", description = "Beer not found")
+        ApiResponse(responseCode = "404", description = "Beer not found. If this occurs during a loop, verify the ID from the collection list.")
     ])
     @GetMapping("/{beerId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificBeer(
@@ -88,10 +91,11 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
         return ResponseEntity.ok(beerPresenter.prepareGetBeer(beer))
     }
 
-    @Operation(summary = "Update a beer", description = "Updates an existing beer by ID.")
+    @Operation(summary = "Update a beer", 
+        description = "Performs a partial update on an existing beer. Only provide the fields that need to change. Ensure the beer exists by calling 'GET /v1/beers/{beerId}' first if the ID was not obtained recently.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Beer updated successfully"),
-        ApiResponse(responseCode = "404", description = "Beer not found")
+        ApiResponse(responseCode = "404", description = "Beer not found. Check if the resource was deleted by another process.")
     ])
     @PatchMapping("/{beerId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateBeer(

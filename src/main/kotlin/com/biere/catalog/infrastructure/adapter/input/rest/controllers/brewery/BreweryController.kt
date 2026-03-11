@@ -22,10 +22,11 @@ import com.biere.catalog.domain.port.output.BreweryPresenterPort
 @RequestMapping("/v1/breweries")
 @Tag(name = "Breweries", description = "Brewery management APIs")
 class BreweryController(private val breweryService: BreweryUseCase, private val breweryPresenter: BreweryPresenterPort) {
-    @Operation(summary = "Register a new brewery", description = "Creates a new brewery.")
+    @Operation(summary = "Register a new brewery", 
+        description = "Registers a new brewery. A valid 'country_id' is required. Obtain the list of valid countries via 'GET /v1/countries' before calling this endpoint.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Brewery created successfully"),
-        ApiResponse(responseCode = "400", description = "Invalid input")
+        ApiResponse(responseCode = "400", description = "Invalid input. Refer to 'remediation' and 'invalid-params' in the response for recovery steps.")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
     fun register(@Valid @RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
@@ -33,7 +34,8 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
         return ResponseEntity.created(URI("/v1/breweries/${brewery.id}")).body(this.breweryPresenter.prepareRegisterBrewery(brewery))
     }
 
-    @Operation(summary = "Get all breweries", description = "Retrieves a list of all breweries.")
+    @Operation(summary = "Get all breweries", 
+        description = "Retrieves all breweries. Use this endpoint to discover valid 'brewery_id' values and their associated countries before performing beer registrations.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
@@ -57,7 +59,8 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
         return ResponseEntity.ok(this.breweryPresenter.prepareGetBrewery(brewery))
     }
 
-    @Operation(summary = "Update a brewery", description = "Updates an existing brewery by ID.")
+    @Operation(summary = "Update a brewery", 
+        description = "Updates an existing brewery. You can change the name or the associated country. Verify the country ID exists via 'GET /v1/countries' if updating the location.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Brewery updated successfully"),
         ApiResponse(responseCode = "404", description = "Brewery not found")

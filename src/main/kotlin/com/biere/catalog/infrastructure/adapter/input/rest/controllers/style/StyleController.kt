@@ -21,10 +21,11 @@ import com.biere.catalog.domain.port.output.StylePresenterPort
 @RequestMapping("/v1/styles")
 @Tag(name = "Styles", description = "Style management APIs")
 class StyleController(private val styleService: StyleUseCase, private val stylePresenter: StylePresenterPort) {
-    @Operation(summary = "Register a new style", description = "Creates a new beer style.")
+    @Operation(summary = "Register a new style", 
+        description = "Creates a new beer style. Verify if the style already exists via 'GET /v1/styles' before creating a new one to avoid duplicates.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Style created successfully"),
-        ApiResponse(responseCode = "400", description = "Invalid input")
+        ApiResponse(responseCode = "400", description = "Invalid input or style already exists. Check the 'remediation' field in the response.")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun register(@Valid @RequestBody inputStyle: StyleRegistrationDTO) : ResponseEntity<ApiIndividualResponseDTO<StyleResponseDTO>>{
@@ -32,7 +33,8 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         return ResponseEntity.created(URI("/v1/styles/${outputStyle.id}")).body(stylePresenter.prepareCreateStyle(outputStyle))
     }
 
-    @Operation(summary = "Get all styles", description = "Retrieves a list of all available beer styles.")
+    @Operation(summary = "Get all styles", 
+        description = "Retrieves all available beer styles. This is a discovery endpoint for obtaining valid 'style_id' values required for beer registration.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
