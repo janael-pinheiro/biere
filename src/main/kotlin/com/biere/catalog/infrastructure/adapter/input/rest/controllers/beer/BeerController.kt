@@ -29,14 +29,16 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @RequestMapping("/v1/beers")
 @Tag(name = "Beers", description = "Beer management APIs")
 @SecurityRequirement(name = "Bearer Authentication")
+@SecurityRequirement(name = "Idempotency Key")
 class BeerController(private val beerService: BeerUseCase, private val beerPresenter: BeerPresenterPort){
     @Operation(summary = "Register a new beer", 
-        description = "Creates a new beer record. Before calling this, ensure you have valid 'brewery_id' and 'style_id'. These must be discovered via 'GET /v1/breweries' and 'GET /v1/styles' respectively. Do not guess IDs.")
+        description = "Creates a new beer record. Before calling this, ensure you have valid 'brewery_id' and 'style_id'. These must be discovered via 'GET /v1/breweries' and 'GET /v1/styles' respectively. You MUST include a unique 'X-Idempotency-Key' in the header to prevent duplicate registrations in case of network retries.")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Beer created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input. Check 'invalid-params' in the response for prescriptive correction.")
     ])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, "application/hal+json"])
+    @SecurityRequirement(name = "Idempotency Key")
     fun register(@Valid @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
         val beer = this.beerService.register(BeerMapper.mapToInputBeer(beerRegistrationDTO))
         val response = beerPresenter.prepareRegistrationResponse(beer)

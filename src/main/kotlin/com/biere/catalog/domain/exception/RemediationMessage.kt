@@ -10,5 +10,6 @@ enum class RemediationMessage(val message: String) {
     TOKEN_REMEDIATION("\"The provided token has expired or is invalid. Use the 'authenticate' link to log in again or 'refresh-token' if you have a refresh token."),
     EMAIL_PASSWORD_REMEDIATION("You need to correct your email and/or password before requesting the token again."),
     COUNTRY_NOT_FOUND_REMEDIATION("You need to check if a country with that id has already been registered or correct the country's id."),
-    COUNTRY_NAME_CONFLICT_REMEDIATION("You need to check if a country with that name has already been registered or correct the country's name.")
+    COUNTRY_NAME_CONFLICT_REMEDIATION("You need to check if a country with that name has already been registered or correct the country's name."),
+    MISSING_IDEMPOTENCY_KEY("For state-changing operations (POST, PUT, PATCH, DELETE), you MUST provide a unique X-Idempotency-Key header to ensure resilience and prevent duplicate processing.")
 }

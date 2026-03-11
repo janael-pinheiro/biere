@@ -20,7 +20,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Configuration
 @EnableWebSecurity
 @Profile("dev")
-class SecurityConfiguration(private val authenticationFilter: AuthenticationFilter) {
+class SecurityConfiguration(
+    private val authenticationFilter: AuthenticationFilter,
+    private val idempotencyFilter: IdempotencyFilter
+) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -32,6 +35,7 @@ class SecurityConfiguration(private val authenticationFilter: AuthenticationFilt
                     .requestMatchers("/v1/users/login", "/v1/users/refresh-token", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**", "/error").permitAll()
                     .anyRequest().hasAuthority("ROLE_USER") }
             .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter::class.java)
+            .addFilterAfter(idempotencyFilter, AuthenticationFilter::class.java)
         return http.build()
     }
 

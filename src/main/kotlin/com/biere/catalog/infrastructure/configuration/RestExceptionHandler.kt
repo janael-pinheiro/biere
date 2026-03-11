@@ -140,6 +140,19 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
         return buildResponse(problemDetail)
     }
 
+    @ExceptionHandler(IdempotencyKeyMissingException::class)
+    fun handleIdempotencyKeyMissing(ex: IdempotencyKeyMissingException, request: HttpServletRequest): ResponseEntity<Any> {
+        val problemDetail = createProblemDetail(
+            HttpStatus.BAD_REQUEST,
+            "Missing Idempotency Key",
+            ex.message,
+            request.servletPath,
+            "idempotency-key-missing",
+            ex.remediation
+        )
+        return buildResponse(problemDetail)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(ex: Exception, request: HttpServletRequest): ResponseEntity<Any> {
         val problemDetail = createProblemDetail(

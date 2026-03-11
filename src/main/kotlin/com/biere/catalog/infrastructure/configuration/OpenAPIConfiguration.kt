@@ -12,10 +12,11 @@ import org.springframework.context.annotation.Configuration
     info = Info(
         title = "Biere Catalog API",
         version = "1.0",
-        description = "API for managing beers, breweries, styles, and countries."
+        description = "API for managing beers, breweries, styles, and countries. Use 'X-Idempotency-Key' in POST/PUT/PATCH operations to prevent duplicate processing."
     ),
     security = [
-        SecurityRequirement(name = "Bearer Authentication")
+        SecurityRequirement(name = "Bearer Authentication"),
+        SecurityRequirement(name = "Idempotency Key")
     ]
 )
 @SecurityScheme(
@@ -23,5 +24,11 @@ import org.springframework.context.annotation.Configuration
     type = SecuritySchemeType.HTTP,
     bearerFormat = "JWT",
     scheme = "bearer"
+)
+@SecurityScheme(
+    name = "Idempotency Key",
+    type = SecuritySchemeType.APIKEY,
+    `in` = io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER,
+    paramName = "X-Idempotency-Key"
 )
 class OpenAPIConfiguration
