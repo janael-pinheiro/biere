@@ -67,6 +67,7 @@ class BeerPresenterAdapter: BeerPresenterPort {
         val beerDto = ApiIndividualResponseDTO(data = BeerMapper.mapToBeerResponseDTO(input))
         this.addSelfLink(beerDto)
         this.addUpdateLink(beerDto)
+        this.addDeleteLink(beerDto)
         return beerDto
     }
 

@@ -26,12 +26,12 @@ class AuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ){
-        val header: String? = request.getHeader("Authorization")
-        if (header == null || !header.contains("Bearer ")){
-            throw NotAuthorizedException("Token not provided")
-        }
-        val token: String = header.split("Bearer ")[1]
         try {
+            val header: String? = request.getHeader("Authorization")
+            if (header == null || !header.contains("Bearer ")){
+                throw NotAuthorizedException("Token not provided")
+            }
+            val token: String = header.split("Bearer ")[1]
             userService.isTokenValid(token)
 
             val username = userService.getEmailFromToken(token)

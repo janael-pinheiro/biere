@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 
 import org.springframework.hateoas.MediaTypes
@@ -27,6 +28,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @RestController
 @RequestMapping("/v1/beers")
 @Tag(name = "Beers", description = "Beer management APIs")
+@SecurityRequirement(name = "Bearer Authentication")
 class BeerController(private val beerService: BeerUseCase, private val beerPresenter: BeerPresenterPort){
     @Operation(summary = "Register a new beer", description = "Creates a new beer record.")
     @ApiResponses(value = [

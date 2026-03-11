@@ -55,6 +55,10 @@ dependencies {
 	// Flyway
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-database-postgresql")
+	// Rate limiting
+	implementation("com.bucket4j:bucket4j_jdk17-core:8.16.1")
+	// OpenAPI
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -65,8 +69,6 @@ dependencies {
 	testImplementation("org.postgresql:postgresql:${postgresqlVersion}")
 	testImplementation("org.testcontainers:postgresql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	// OpenAPI
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 }
 
 allOpen {
