@@ -7,7 +7,9 @@ import com.biere.catalog.domain.model.InputUser
 import com.biere.catalog.domain.exception.NotAuthorizedException
 import com.biere.catalog.domain.exception.InvalidTokenException
 import com.biere.catalog.domain.exception.ExpiredTokenException
+import com.biere.catalog.domain.exception.NotFoundException
 import com.biere.catalog.domain.exception.RemediationMessage
+import com.biere.catalog.infrastructure.adapter.output.persistence.entity.UserEntity
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service
 import java.security.Key
 import java.security.MessageDigest
 import java.util.Date
+import java.util.Optional
 
 @Service
 class UserService(
@@ -44,20 +47,37 @@ class UserService(
     }
 
     override fun refreshToken(refreshToken: String): TokenModel {
+        val email = getEmailFromToken(refreshToken)
         val now = Date()
-        val accessToken = createToken("", now.time + accessTokenExpiration, now)
-        val newRefreshToken = createToken("", now.time + refreshTokenExpiration, now)
+        val accessToken = createToken(email, now.time + accessTokenExpiration, now)
+        val newRefreshToken = createToken(email, now.time + refreshTokenExpiration, now)
         return TokenModel(accessToken = accessToken, refreshToken = newRefreshToken)
     }
 
     private fun createToken(email: String, expiration: Long, issueAt: Date): String {
-        val jwtToken = Jwts.builder()
+        val optionalUser: Optional<UserEntity> = userOutputPort.findByEmail(email)
+        val scopes = mutableListOf("ROLE_USER")
+        if (optionalUser.isPresent) {
+            val user = optionalUser.get()
+            user.roles.forEach { role ->
+                role.scopes.forEach { scope ->
+                    scopes.add("SCOPE_${scope.name}")
+                }
+            }
+        }
+//        val scopes = if (email == "admin@biere.com") {
+//            listOf("ROLE_USER", "SCOPE_beers:read", "SCOPE_beers:write", "SCOPE_breweries:read", "SCOPE_breweries:write")
+//        } else {
+//            listOf("ROLE_USER", "SCOPE_beers:read", "SCOPE_breweries:read")
+//        }
+
+        return Jwts.builder()
             .subject(email)
+            .claim("scopes", scopes)
             .issuedAt(issueAt)
             .expiration(Date(expiration))
             .signWith(signingKey)
             .compact()
-        return jwtToken
     }
 
     private fun isUserValid(email: String, password: String): Boolean {
@@ -92,6 +112,12 @@ class UserService(
     override fun getEmailFromToken(token: String): String {
         val parsedToken = parseToken(token)
         return parsedToken.payload.subject
+    }
+
+    override fun getScopesFromToken(token: String): List<String> {
+        val parsedToken = parseToken(token)
+        @Suppress("UNCHECKED_CAST")
+        return parsedToken.payload["scopes"] as? List<String> ?: emptyList()
     }
 
     private fun parseToken(token: String): Jws<Claims> {

@@ -153,6 +153,19 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
         return buildResponse(problemDetail)
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException::class)
+    fun handleAccessDeniedException(ex: org.springframework.security.access.AccessDeniedException, request: HttpServletRequest): ResponseEntity<Any> {
+        val problemDetail = createProblemDetail(
+            HttpStatus.FORBIDDEN,
+            "Forbidden",
+            ex.message,
+            request.servletPath,
+            "forbidden",
+            "You do not have the required scope to perform this operation. Check your user permissions or contact an administrator to request the necessary access."
+        )
+        return buildResponse(problemDetail)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(ex: Exception, request: HttpServletRequest): ResponseEntity<Any> {
         val problemDetail = createProblemDetail(

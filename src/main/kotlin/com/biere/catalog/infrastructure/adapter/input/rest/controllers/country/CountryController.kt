@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*
 import java.net.URI
 
 import com.biere.catalog.domain.port.output.CountryPresenterPort
+import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
+import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/v1/countries")
@@ -26,6 +28,7 @@ class CountryController(private val countryService: CountryUseCase, private val 
         ApiResponse(responseCode = "201", description = "Country created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input. Check the 'remediation' field for instructions on how to proceed.")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.COUNTRY_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun registerCountry(@Valid @RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.register(countryRegistrationDTO.name)
@@ -39,6 +42,7 @@ class CountryController(private val countryService: CountryUseCase, private val 
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.COUNTRY_READ}')")
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCountries(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<CountryResponseDTO>>>>{
         val countries = this.countryService.getCountries()
@@ -50,6 +54,7 @@ class CountryController(private val countryService: CountryUseCase, private val 
         ApiResponse(responseCode = "200", description = "Successfully retrieved country"),
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.COUNTRY_READ}')")
     @GetMapping("/{countryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificCountry(
         @Parameter(description = "ID of the country to be retrieved", example = "1")
@@ -64,6 +69,7 @@ class CountryController(private val countryService: CountryUseCase, private val 
         ApiResponse(responseCode = "204", description = "Country deleted successfully"),
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.COUNTRY_WRITE}')")
     @DeleteMapping("/{countryId}")
     fun deleteCountry(
         @Parameter(description = "ID of the country to be deleted", example = "1")
@@ -78,6 +84,7 @@ class CountryController(private val countryService: CountryUseCase, private val 
         ApiResponse(responseCode = "200", description = "Country updated successfully"),
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.COUNTRY_WRITE}')")
     @PutMapping("{countryId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateCountry(
         @Parameter(description = "ID of the country to be updated", example = "1")

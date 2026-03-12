@@ -103,4 +103,8 @@ class IdempotencyFilter(
             idempotencyRepository.save(key, idempotencyResponse)
         }
     }
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        return request.servletPath == "/v1/users/login"
+    }
 }

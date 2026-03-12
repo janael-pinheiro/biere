@@ -8,6 +8,7 @@ interface UserUseCase {
     fun refreshToken(refreshToken: String): TokenModel
     fun isTokenValid(token: String)
     fun getEmailFromToken(token: String): String
+    fun getScopesFromToken(token: String): List<String>
     fun registerUser(user: InputUser): Long
     fun removeUser(userId: Long)
 }

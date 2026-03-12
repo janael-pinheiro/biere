@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*
 import java.net.URI
 
 import com.biere.catalog.domain.port.output.StylePresenterPort
+import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
+import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/v1/styles")
@@ -27,6 +29,7 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         ApiResponse(responseCode = "201", description = "Style created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input or style already exists. Check the 'remediation' field in the response.")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.STYLE_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun register(@Valid @RequestBody inputStyle: StyleRegistrationDTO) : ResponseEntity<ApiIndividualResponseDTO<StyleResponseDTO>>{
         val outputStyle = styleService.register(inputStyle.name)
@@ -38,6 +41,7 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.STYLE_READ}')")
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getStyles(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<StyleResponseDTO>>>> {
         val styles = styleService.getStyles()
@@ -49,6 +53,7 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         ApiResponse(responseCode = "200", description = "Successfully retrieved style"),
         ApiResponse(responseCode = "404", description = "Style not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.STYLE_READ}')")
     @GetMapping("{styleId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificStyle(
         @Parameter(description = "ID of the style to be retrieved", example = "1")
@@ -63,6 +68,7 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         ApiResponse(responseCode = "200", description = "Style updated successfully"),
         ApiResponse(responseCode = "404", description = "Style not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.STYLE_WRITE}')")
     @PutMapping("{styleId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateStyle(
         @Parameter(description = "ID of the style to be updated", example = "1")
@@ -81,6 +87,7 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         ApiResponse(responseCode = "200", description = "Successfully deleted the style"),
         ApiResponse(responseCode = "404", description = "Style not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.STYLE_WRITE}')")
     @DeleteMapping("{styleId}")
     fun deleteStyle(
         @Parameter(description = "ID of the style to be deleted", example = "1")

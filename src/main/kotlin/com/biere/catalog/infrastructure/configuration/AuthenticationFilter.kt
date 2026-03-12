@@ -35,11 +35,14 @@ class AuthenticationFilter(
             userService.isTokenValid(token)
 
             val username = userService.getEmailFromToken(token)
+            val scopes = userService.getScopesFromToken(token)
+            val authorities = scopes.map { org.springframework.security.core.authority.SimpleGrantedAuthority(it) }
+            
             val userDetails = userDetailsService.loadUserByUsername(username)
             val authToken = UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
-                userDetails.authorities
+                authorities
             )
             authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = authToken

@@ -5,6 +5,7 @@ import com.biere.catalog.infrastructure.adapter.input.rest.dtos.TokenResponseDTO
 import com.biere.catalog.infrastructure.adapter.input.rest.dtos.UserRegistrationDTO
 import com.biere.catalog.domain.model.InputUser
 import com.biere.catalog.domain.port.input.UserUseCase
+import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.Parameter
+import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/v1/users")
@@ -42,7 +44,7 @@ class UserController(
     @PostMapping("refresh-token", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun refreshToken(@RequestHeader headers: HttpHeaders): ResponseEntity<TokenResponseDTO>{
         val token = userService.refreshToken(
-            headers.get("authorization")?.get(0).toString().replace("Bearer", ""))
+            headers.get("authorization")?.get(0).toString().replace("Bearer", "").trim())
         return ResponseEntity.ok(TokenResponseDTO(accessToken = token.accessToken, refreshToken = token.refreshToken))
     }
 
@@ -51,6 +53,7 @@ class UserController(
         ApiResponse(responseCode = "201", description = "User created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input")
     ])
+    @PreAuthorize("hasAnyAuthority('${Scopes.USER_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun createUser(@RequestBody user: UserRegistrationDTO): ResponseEntity<String> {
         userService.registerUser(InputUser(name = user.name, email = user.email, password = user.password))
@@ -62,6 +65,7 @@ class UserController(
         ApiResponse(responseCode = "200", description = "User removed successfully"),
         ApiResponse(responseCode = "404", description = "User not found")
     ])
+    @PreAuthorize("hasAnyAuthority('${Scopes.USER_WRITE}')")
     @DeleteMapping("{userId}")
     fun removeUser(
         @Parameter(description = "ID of the user to be removed", example = "1")

@@ -7,6 +7,7 @@ import com.biere.catalog.domain.port.input.BreweryUseCase
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.security.access.prepost.PreAuthorize
 import java.net.URI
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.springframework.hateoas.MediaTypes
+import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
 
 import com.biere.catalog.domain.port.output.BreweryPresenterPort
 
@@ -28,6 +30,7 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
         ApiResponse(responseCode = "201", description = "Brewery created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input. Refer to 'remediation' and 'invalid-params' in the response for recovery steps.")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BREWERY_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
     fun register(@Valid @RequestBody inputBrewery: BreweryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BreweryResponseDTO>>{
         val brewery = this.breweryService.register(inputBrewery.name, inputBrewery.countryId!!)
@@ -39,6 +42,7 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BREWERY_READ}')")
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
     fun getBreweries(): ResponseEntity<ApiCollectionResponseDTO<List<ApiIndividualResponseDTO<BreweryResponseDTO>>>>{
         val breweries = breweryService.getBreweries()
@@ -50,6 +54,7 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
         ApiResponse(responseCode = "200", description = "Successfully retrieved brewery"),
         ApiResponse(responseCode = "404", description = "Brewery not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BREWERY_READ}')")
     @GetMapping("/{breweryId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificBrewery(
         @Parameter(description = "ID of the brewery to be retrieved", example = "1")
@@ -65,6 +70,7 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
         ApiResponse(responseCode = "200", description = "Brewery updated successfully"),
         ApiResponse(responseCode = "404", description = "Brewery not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BREWERY_WRITE}')")
     @PutMapping("/{breweryId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateCountry(
         @Parameter(description = "ID of the brewery to be updated", example = "1")
@@ -80,6 +86,7 @@ class BreweryController(private val breweryService: BreweryUseCase, private val 
         ApiResponse(responseCode = "200", description = "Successfully deleted"),
         ApiResponse(responseCode = "404", description = "Brewery not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BREWERY_WRITE}')")
     @DeleteMapping("/{breweryId}")
     fun deleteBrewery(
         @Parameter(description = "ID of the brewery to be deleted", example = "1")

@@ -13,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.security.access.prepost.PreAuthorize
 import java.net.URI
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -24,6 +25,7 @@ import jakarta.validation.Valid
 
 import org.springframework.hateoas.MediaTypes
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
 
 @RestController
 @RequestMapping("/v1/beers")
@@ -32,11 +34,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 @SecurityRequirement(name = "Idempotency Key")
 class BeerController(private val beerService: BeerUseCase, private val beerPresenter: BeerPresenterPort){
     @Operation(summary = "Register a new beer", 
-        description = "Creates a new beer record. Before calling this, ensure you have valid 'brewery_id' and 'style_id'. These must be discovered via 'GET /v1/breweries' and 'GET /v1/styles' respectively. You MUST include a unique 'X-Idempotency-Key' in the header to prevent duplicate registrations in case of network retries.")
+        description = "Creates a new beer record. Required scope: 'beers:write'. Before calling this, ensure you have valid 'brewery_id' and 'style_id'...")
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Beer created successfully"),
         ApiResponse(responseCode = "400", description = "Invalid input. Check 'invalid-params' in the response for prescriptive correction.")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BEER_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE, "application/hal+json"])
     @SecurityRequirement(name = "Idempotency Key")
     fun register(@Valid @RequestBody beerRegistrationDTO: BeerRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<BeerResponseDTO>> {
@@ -47,10 +50,11 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
 
 
     @Operation(summary = "Get all beers (JSON)", 
-        description = "Retrieves a paginated list of beers. Use the 'page' parameter to navigate. For autonomous navigation, prefer using the HATEOAS links provided in the 'page' metadata (first, last, next, previous).")
+        description = "Retrieves a paginated list of beers. Required scope: 'beers:read'. Use the 'page' parameter to navigate...")
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved list")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BEER_READ}')")
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE])
     fun getBeersJson(
         @Parameter(description = "Pagination information")
@@ -84,6 +88,7 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
         ApiResponse(responseCode = "200", description = "Successfully retrieved beer"),
         ApiResponse(responseCode = "404", description = "Beer not found. If this occurs during a loop, verify the ID from the collection list.")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BEER_READ}')")
     @GetMapping("/{beerId}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getSpecificBeer(
         @Parameter(description = "ID of the beer to be retrieved", example = "1")
@@ -99,6 +104,7 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
         ApiResponse(responseCode = "200", description = "Beer updated successfully"),
         ApiResponse(responseCode = "404", description = "Beer not found. Check if the resource was deleted by another process.")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BEER_WRITE}')")
     @PatchMapping("/{beerId}", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateBeer(
         @Parameter(description = "ID of the beer to be updated", example = "1")
@@ -119,6 +125,7 @@ class BeerController(private val beerService: BeerUseCase, private val beerPrese
         ApiResponse(responseCode = "204", description = "Beer deleted successfully"),
         ApiResponse(responseCode = "404", description = "Beer not found")
     ])
+    @PreAuthorize("hasAuthority('${Scopes.BEER_WRITE}')")
     @DeleteMapping("/{beerId}")
     fun deleteBeer(
         @Parameter(description = "ID of the beer to be deleted", example = "1")
