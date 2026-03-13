@@ -2,13 +2,21 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Biere Catalog API",
-    "description": "API for managing beers, breweries, styles, and countries.",
+    "description": "API for managing beers, breweries, styles, and countries. Use \u0027X-Idempotency-Key\u0027 in POST/PUT/PATCH operations to prevent duplicate processing.",
     "version": "1.0"
   },
   "servers": [
     {
       "url": "http://localhost:8080",
       "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "Bearer Authentication": []
+    },
+    {
+      "Idempotency Key": []
     }
   ],
   "tags": [
@@ -350,7 +358,7 @@
           "Breweries"
         ],
         "summary": "Update a brewery",
-        "description": "Updates an existing brewery by ID.",
+        "description": "Updates an existing brewery. You can change the name or the associated country. Verify the country ID exists via \u0027GET /v1/countries\u0027 if updating the location.",
         "operationId": "updateCountry_1",
         "parameters": [
           {
@@ -476,11 +484,11 @@
           "Users"
         ],
         "summary": "Refresh Token",
-        "description": "Refreshes the authentication token.",
+        "description": "Refreshes the authentication session. Use this when the \u0027access_token\u0027 expires (indicated by a 401 response with \u0027invalid-token\u0027 type). Provides a new access/refresh token pair without requiring full login.",
         "operationId": "refreshToken",
         "responses": {
           "401": {
-            "description": "Invalid or expired token",
+            "description": "Invalid or expired token. If refreshing fails, you must re-authenticate via \u0027POST /v1/users/login\u0027.",
             "content": {
               "application/json": {
                 "schema": {
@@ -508,7 +516,7 @@
           "Users"
         ],
         "summary": "Login",
-        "description": "Authenticates a user and returns a token.",
+        "description": "Authenticates a user. This is the first step for any state-changing operation. If successful, you will receive an \u0027access_token\u0027 to be used in the \u0027Authorization: Bearer\u0027 header of subsequent requests.",
         "operationId": "getToken",
         "requestBody": {
           "content": {
@@ -532,7 +540,7 @@
             }
           },
           "401": {
-            "description": "Invalid credentials",
+            "description": "Invalid credentials. If this fails, do not retry automatically without ensuring credentials are correct.",
             "content": {
               "application/json": {
                 "schema": {
@@ -550,7 +558,7 @@
           "Styles"
         ],
         "summary": "Get all styles",
-        "description": "Retrieves a list of all available beer styles.",
+        "description": "Retrieves all available beer styles. This is a discovery endpoint for obtaining valid \u0027style_id\u0027 values required for beer registration.",
         "operationId": "getStyles",
         "responses": {
           "200": {
@@ -570,7 +578,7 @@
           "Styles"
         ],
         "summary": "Register a new style",
-        "description": "Creates a new beer style.",
+        "description": "Creates a new beer style. Verify if the style already exists via \u0027GET /v1/styles\u0027 before creating a new one to avoid duplicates.",
         "operationId": "register",
         "requestBody": {
           "content": {
@@ -594,7 +602,7 @@
             }
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input or style already exists. Check the \u0027remediation\u0027 field in the response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -612,7 +620,7 @@
           "Countries"
         ],
         "summary": "Get all countries",
-        "description": "Retrieves a list of all countries.",
+        "description": "Retrieves all countries. Use this to find the correct \u0027country_id\u0027 when managing breweries. Cache this list if you are doing multiple operations to save resources.",
         "operationId": "getCountries",
         "responses": {
           "200": {
@@ -632,7 +640,7 @@
           "Countries"
         ],
         "summary": "Register a new country",
-        "description": "Creates a new country.",
+        "description": "Creates a new country. Countries are base resources. You might need to create a country before registering a brewery if it\u0027s not already in the system.",
         "operationId": "registerCountry",
         "requestBody": {
           "content": {
@@ -646,7 +654,7 @@
         },
         "responses": {
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input. Check the \u0027remediation\u0027 field for instructions on how to proceed.",
             "content": {
               "application/json": {
                 "schema": {
@@ -674,7 +682,7 @@
           "Breweries"
         ],
         "summary": "Get all breweries",
-        "description": "Retrieves a list of all breweries.",
+        "description": "Retrieves all breweries. Use this endpoint to discover valid \u0027brewery_id\u0027 values and their associated countries before performing beer registrations.",
         "operationId": "getBreweries",
         "responses": {
           "200": {
@@ -699,7 +707,7 @@
           "Breweries"
         ],
         "summary": "Register a new brewery",
-        "description": "Creates a new brewery.",
+        "description": "Registers a new brewery. A valid \u0027country_id\u0027 is required. Obtain the list of valid countries via \u0027GET /v1/countries\u0027 before calling this endpoint.",
         "operationId": "register_1",
         "requestBody": {
           "content": {
@@ -712,8 +720,8 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Invalid input",
+          "201": {
+            "description": "Brewery created successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -727,8 +735,8 @@
               }
             }
           },
-          "201": {
-            "description": "Brewery created successfully",
+          "400": {
+            "description": "Invalid input. Refer to \u0027remediation\u0027 and \u0027invalid-params\u0027 in the response for recovery steps.",
             "content": {
               "application/json": {
                 "schema": {
@@ -751,7 +759,7 @@
           "Beers"
         ],
         "summary": "Get all beers (JSON)",
-        "description": "Retrieves a paginated list of beers in JSON format.",
+        "description": "Retrieves a paginated list of beers. Required scope: \u0027beers:read\u0027. Use the \u0027page\u0027 parameter to navigate...",
         "operationId": "getBeersCsv",
         "parameters": [
           {
@@ -776,14 +784,22 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Idempotency Key": []
+          },
+          {
+            "Bearer Authentication": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "Beers"
         ],
         "summary": "Register a new beer",
-        "description": "Creates a new beer record.",
+        "description": "Creates a new beer record. Required scope: \u0027beers:write\u0027. Before calling this, ensure you have valid \u0027brewery_id\u0027 and \u0027style_id\u0027...",
         "operationId": "register_2",
         "requestBody": {
           "content": {
@@ -812,7 +828,7 @@
             }
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input. Check \u0027invalid-params\u0027 in the response for prescriptive correction.",
             "content": {
               "application/json": {
                 "schema": {
@@ -826,7 +842,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Idempotency Key": []
+          },
+          {
+            "Bearer Authentication": []
+          }
+        ]
       }
     },
     "/v1/beers/{beerId}": {
@@ -835,7 +859,7 @@
           "Beers"
         ],
         "summary": "Get a specific beer",
-        "description": "Retrieves details of a specific beer by ID.",
+        "description": "Retrieves details of a specific beer. Use this to verify the current state before performing an update or delete operation.",
         "operationId": "getSpecificBeer",
         "parameters": [
           {
@@ -852,7 +876,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Beer not found",
+            "description": "Beer not found. If this occurs during a loop, verify the ID from the collection list.",
             "content": {
               "application/json": {
                 "schema": {
@@ -871,7 +895,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Idempotency Key": []
+          },
+          {
+            "Bearer Authentication": []
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -900,14 +932,22 @@
           "204": {
             "description": "Beer deleted successfully"
           }
-        }
+        },
+        "security": [
+          {
+            "Idempotency Key": []
+          },
+          {
+            "Bearer Authentication": []
+          }
+        ]
       },
       "patch": {
         "tags": [
           "Beers"
         ],
         "summary": "Update a beer",
-        "description": "Updates an existing beer by ID.",
+        "description": "Performs a partial update on an existing beer. Only provide the fields that need to change. Ensure the beer exists by calling \u0027GET /v1/beers/{beerId}\u0027 first if the ID was not obtained recently.",
         "operationId": "updateBeer",
         "parameters": [
           {
@@ -934,7 +974,7 @@
         },
         "responses": {
           "404": {
-            "description": "Beer not found",
+            "description": "Beer not found. Check if the resource was deleted by another process.",
             "content": {
               "application/json": {
                 "schema": {
@@ -953,7 +993,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Idempotency Key": []
+          },
+          {
+            "Bearer Authentication": []
+          }
+        ]
       }
     },
     "/v1/users/{userId}": {
@@ -1608,6 +1656,18 @@
             "type": "boolean"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "Bearer Authentication": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "Idempotency Key": {
+        "type": "apiKey",
+        "name": "X-Idempotency-Key",
+        "in": "header"
       }
     }
   }
