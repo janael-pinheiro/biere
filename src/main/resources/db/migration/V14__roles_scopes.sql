@@ -1,0 +1,1 @@
+CREATE TABLE roles_scopes (role_id INT REFERENCES roles(id), scope_id INT REFERENCES scopes(id), PRIMARY KEY (role_id, scope_id));
