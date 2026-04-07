@@ -17,29 +17,41 @@ import java.net.URI
 
 import com.biere.catalog.domain.port.output.StylePresenterPort
 import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/v1/styles")
 @Tag(name = "Styles", description = "Style management APIs")
 class StyleController(private val styleService: StyleUseCase, private val stylePresenter: StylePresenterPort) {
-    @Operation(summary = "Register a new style", 
-        description = "Creates a new beer style. Verify if the style already exists via 'GET /v1/styles' before creating a new one to avoid duplicates.")
+    @Operation(
+        summary = "Register a new style",
+        description = "Creates a new beer style. Verify if the style already exists via 'GET /v1/styles' before creating a new one to avoid duplicates.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_styles:write"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Style created successfully"),
-        ApiResponse(responseCode = "400", description = "Invalid input or style already exists. Check the 'remediation' field in the response.")
+        ApiResponse(responseCode = "400", description = "Invalid input or style already exists. Check the 'remediation' field in the response."),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: styles:write")
     ])
     @PreAuthorize("hasAuthority('${Scopes.STYLE_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun register(@Valid @RequestBody inputStyle: StyleRegistrationDTO) : ResponseEntity<ApiIndividualResponseDTO<StyleResponseDTO>>{
         val outputStyle = styleService.register(inputStyle.name)
-        return ResponseEntity.created(URI("/v1/styles/${outputStyle.id}")).body(stylePresenter.prepareCreateStyle(outputStyle))
+        val location = URI("/v1/styles/${outputStyle.id}")
+        return ResponseEntity.created(location)
+            .header("Content-Location", location.toString())
+            .body(stylePresenter.prepareCreateStyle(outputStyle))
     }
 
-    @Operation(summary = "Get all styles", 
-        description = "Retrieves all available beer styles. This is a discovery endpoint for obtaining valid 'style_id' values required for beer registration.")
+    @Operation(
+        summary = "Get all styles",
+        description = "Retrieves all available beer styles. This is a discovery endpoint for obtaining valid 'style_id' values required for beer registration.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_styles:read"])]
+    )
     @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Successfully retrieved list")
+        ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: styles:read")
     ])
     @PreAuthorize("hasAuthority('${Scopes.STYLE_READ}')")
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -48,9 +60,14 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         return ResponseEntity.ok(stylePresenter.prepareGetStyles(styles))
     }
 
-    @Operation(summary = "Get a specific style", description = "Retrieves details of a specific style by ID.")
+    @Operation(
+        summary = "Get a specific style",
+        description = "Retrieves details of a specific style by ID.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_styles:read"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved style"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: styles:read"),
         ApiResponse(responseCode = "404", description = "Style not found")
     ])
     @PreAuthorize("hasAuthority('${Scopes.STYLE_READ}')")
@@ -63,9 +80,14 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         return ResponseEntity.ok().body(stylePresenter.prepareGetStyle(style))
     }
 
-    @Operation(summary = "Update a style", description = "Updates an existing style by ID.")
+    @Operation(
+        summary = "Update a style",
+        description = "Updates an existing style by ID.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_styles:write"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Style updated successfully"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: styles:write"),
         ApiResponse(responseCode = "404", description = "Style not found")
     ])
     @PreAuthorize("hasAuthority('${Scopes.STYLE_WRITE}')")
@@ -82,9 +104,14 @@ class StyleController(private val styleService: StyleUseCase, private val styleP
         return ResponseEntity.ok().body(stylePresenter.prepareUpdateStyle(updatedStyle))
     }
 
-    @Operation(summary = "Delete a style", description = "Deletes an existing style by ID.")
+    @Operation(
+        summary = "Delete a style",
+        description = "Permanently removes a style. Ensure no beers are using this style before deleting.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_styles:write"])]
+    )
     @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Successfully deleted the style"),
+        ApiResponse(responseCode = "204", description = "Successfully deleted the style"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: styles:write"),
         ApiResponse(responseCode = "404", description = "Style not found")
     ])
     @PreAuthorize("hasAuthority('${Scopes.STYLE_WRITE}')")

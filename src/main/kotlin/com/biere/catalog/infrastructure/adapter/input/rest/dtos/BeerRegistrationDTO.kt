@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Min
 
 @Schema(description = "DTO for beer registration request")
 data class BeerRegistrationDTO(
@@ -17,6 +18,7 @@ data class BeerRegistrationDTO(
     @JsonProperty("alcohol_content")
     @field:NotNull(message = "Alcohol content can't be null")
     @field:Max(value = 100, message = "Alcohol content can't be greater than 100%")
+    @field:Min(value = 0, message = "Alcohol content can't be less than 0%")
     @Schema(description = "Alcohol content percentage", example = "5.0", minimum = "0.0", maximum = "100.0", requiredMode = Schema.RequiredMode.REQUIRED)
     val alcoholContent: Float?,
 

@@ -82,7 +82,7 @@ class BeerPresenterAdapter: BeerPresenterPort {
         return beerDto
     }
 
-    override fun prepareUpdateBrewery(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {
+    override fun prepareUpdateBeer(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {
         return this.prepareGetBeer(beerModel)
     }
 

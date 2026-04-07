@@ -13,5 +13,5 @@ interface BeerPresenterPort {
     fun prepareCsvData(beers: PaginatedResult<List<OutputBeerModel>>): ByteArrayResource
     fun prepareRegistrationResponse(input: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
     fun prepareGetBeer(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
-    fun prepareUpdateBrewery(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
+    fun prepareUpdateBeer(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO>
 }

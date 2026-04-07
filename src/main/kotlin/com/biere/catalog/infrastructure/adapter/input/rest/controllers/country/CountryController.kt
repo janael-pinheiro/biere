@@ -16,31 +16,42 @@ import java.net.URI
 
 import com.biere.catalog.domain.port.output.CountryPresenterPort
 import com.biere.catalog.infrastructure.adapter.input.rest.controllers.Scopes
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/v1/countries")
 @Tag(name = "Countries", description = "Country management APIs")
 class CountryController(private val countryService: CountryUseCase, private val countryPresenter: CountryPresenterPort) {
-    @Operation(summary = "Register a new country", 
-        description = "Creates a new country. Countries are base resources. You might need to create a country before registering a brewery if it's not already in the system.")
+    @Operation(
+        summary = "Register a new country",
+        description = "Creates a new country. Countries are base resources. Create one before registering a brewery if it does not yet exist in the system.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_countries:write"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "201", description = "Country created successfully"),
-        ApiResponse(responseCode = "400", description = "Invalid input. Check the 'remediation' field for instructions on how to proceed.")
+        ApiResponse(responseCode = "400", description = "Invalid input. Check the 'remediation' field for instructions on how to proceed."),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: countries:write")
     ])
     @PreAuthorize("hasAuthority('${Scopes.COUNTRY_WRITE}')")
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun registerCountry(@Valid @RequestBody countryRegistrationDTO: CountryRegistrationDTO): ResponseEntity<ApiIndividualResponseDTO<CountryResponseDTO>> {
         val country = this.countryService.register(countryRegistrationDTO.name)
+        val location = URI("/v1/countries/${country.id}")
         return ResponseEntity
-            .created(URI("/v1/countries/${country.id}"))
+            .created(location)
+            .header("Content-Location", location.toString())
             .body(countryPresenter.prepareCreateCountry(country));
     }
 
-    @Operation(summary = "Get all countries", 
-        description = "Retrieves all countries. Use this to find the correct 'country_id' when managing breweries. Cache this list if you are doing multiple operations to save resources.")
+    @Operation(
+        summary = "Get all countries",
+        description = "Retrieves all countries. Use this to find the correct 'country_id' when managing breweries. Cache this list if doing multiple operations.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_countries:read"])]
+    )
     @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Successfully retrieved list")
+        ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: countries:read")
     ])
     @PreAuthorize("hasAuthority('${Scopes.COUNTRY_READ}')")
     @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -49,9 +60,14 @@ class CountryController(private val countryService: CountryUseCase, private val 
         return ResponseEntity.ok(this.countryPresenter.prepareGetAllCountries(countries))
     }
 
-    @Operation(summary = "Get a specific country", description = "Retrieves details of a specific country by ID.")
+    @Operation(
+        summary = "Get a specific country",
+        description = "Retrieves details of a specific country by ID.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_countries:read"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Successfully retrieved country"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: countries:read"),
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @PreAuthorize("hasAuthority('${Scopes.COUNTRY_READ}')")
@@ -64,9 +80,14 @@ class CountryController(private val countryService: CountryUseCase, private val 
         return ResponseEntity.ok(this.countryPresenter.prepareGetCountry(countryResponse))
     }
 
-    @Operation(summary = "Delete a country", description = "Deletes a country by ID.")
+    @Operation(
+        summary = "Delete a country",
+        description = "Deletes a country by ID. Ensure no breweries are linked to this country before deleting.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_countries:write"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "204", description = "Country deleted successfully"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: countries:write"),
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @PreAuthorize("hasAuthority('${Scopes.COUNTRY_WRITE}')")
@@ -79,9 +100,14 @@ class CountryController(private val countryService: CountryUseCase, private val 
         return ResponseEntity.noContent().build()
     }
 
-    @Operation(summary = "Update a country", description = "Updates an existing country by ID.")
+    @Operation(
+        summary = "Update a country",
+        description = "Updates an existing country by ID.",
+        security = [SecurityRequirement(name = "Bearer Authentication"), SecurityRequirement(name = "OAuth2 Scopes", scopes = ["SCOPE_countries:write"])]
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Country updated successfully"),
+        ApiResponse(responseCode = "403", description = "Insufficient scope. Requires: countries:write"),
         ApiResponse(responseCode = "404", description = "Country not found")
     ])
     @PreAuthorize("hasAuthority('${Scopes.COUNTRY_WRITE}')")

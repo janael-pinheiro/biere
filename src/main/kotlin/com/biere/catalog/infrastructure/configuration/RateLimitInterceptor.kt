@@ -21,10 +21,6 @@ class RateLimitInterceptor(
 ): HandlerInterceptor {
     private val cache: MutableMap<String, Bucket> = ConcurrentHashMap()
 
-    fun clearCache() {
-        cache.clear()
-    }
-
     private fun getBucket(requesterIdentifier: String): Bucket {
         return cache.computeIfAbsent(requesterIdentifier) { createBucket() }
     }
@@ -47,10 +43,11 @@ class RateLimitInterceptor(
         val probe: ConsumptionProbe = bucket.tryConsumeAndReturnRemaining(1)
         if (probe.isConsumed) {
             response.addHeader("X-Rate-Limit-Remaining", probe.remainingTokens.toString())
+            response.addHeader("X-Rate-Limit-Total", capacity.toString())
             return true
         }
         val waitForRefill = probe.nanosToWaitForRefill / 1_000_000_000
         response.addHeader("X-Rate-Limit-Retry-After-Seconds", waitForRefill.toString())
-        throw RateLimitException("You have exhausted your API Request Quota")
+        throw RateLimitException("You have exhausted your API Request Quota", retryAfterSeconds = waitForRefill)
     }
 }

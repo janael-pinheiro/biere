@@ -24,7 +24,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Profile("dev")
 class SecurityConfiguration(
     private val authenticationFilter: AuthenticationFilter,
-    private val idempotencyFilter: IdempotencyFilter
+    private val idempotencyFilter: IdempotencyFilter,
+    private val correlationIdFilter: CorrelationIdFilter
 ) {
 
     @Bean
@@ -36,6 +37,7 @@ class SecurityConfiguration(
                 authorize
                     .requestMatchers("/v1/users/login", "/v1/users/refresh-token", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**", "/error").permitAll()
                     .anyRequest().authenticated() }
+            .addFilterBefore(correlationIdFilter, org.springframework.security.web.header.HeaderWriterFilter::class.java)
             .addFilterBefore(authenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter::class.java)
             .addFilterAfter(idempotencyFilter, AuthenticationFilter::class.java)
         return http.build()

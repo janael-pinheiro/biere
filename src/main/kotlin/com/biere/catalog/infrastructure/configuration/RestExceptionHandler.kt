@@ -16,11 +16,14 @@ import com.biere.catalog.infrastructure.adapter.input.rest.controllers.beer.Beer
 import java.net.URI
 
 import com.biere.catalog.infrastructure.adapter.input.rest.dtos.TokenRequestDTO
+import org.springframework.beans.factory.annotation.Value
 import java.time.OffsetDateTime
 import java.util.UUID
+import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authorization.AuthorizationDeniedException
 
 @ControllerAdvice
-class RestExceptionHandler : ResponseEntityExceptionHandler() {
+class RestExceptionHandler(@Value("\${rate-limit.capacity:20}") private val capacity: Long,) : ResponseEntityExceptionHandler() {
 
     private val ERROR_TYPE_BASE = "https://biere.catalog.com/problem"
 
@@ -135,9 +138,15 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
             ex.message,
             request.servletPath,
             "too-many-requests",
-            "You have exceeded the allowed request rate. Slow down your requests and check the 'Retry-After' header for when you can try again."
+            "You have exceeded the allowed request rate. Wait ${ex.retryAfterSeconds} second(s) before retrying. Check the 'X-Rate-Limit-Retry-After-Seconds' header for the exact wait time."
         )
-        return buildResponse(problemDetail)
+        problemDetail.setProperty("retry-after-seconds", ex.retryAfterSeconds)
+
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_PROBLEM_JSON
+        headers.set("X-Rate-Limit-Retry-After-Seconds", ex.retryAfterSeconds.toString())
+        headers.set("Retry-After", ex.retryAfterSeconds.toString())
+        return ResponseEntity(problemDetail, headers, HttpStatusCode.valueOf(problemDetail.status))
     }
 
     @ExceptionHandler(IdempotencyKeyMissingException::class)
@@ -153,12 +162,12 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
         return buildResponse(problemDetail)
     }
 
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException::class)
-    fun handleAccessDeniedException(ex: org.springframework.security.access.AccessDeniedException, request: HttpServletRequest): ResponseEntity<Any> {
+    @ExceptionHandler(AccessDeniedException::class, AuthorizationDeniedException::class)
+    fun handleAccessDeniedException(ex: Exception, request: HttpServletRequest): ResponseEntity<Any> {
         val problemDetail = createProblemDetail(
             HttpStatus.FORBIDDEN,
             "Forbidden",
-            ex.message,
+            ex.message ?: "Access Denied",
             request.servletPath,
             "forbidden",
             "You do not have the required scope to perform this operation. Check your user permissions or contact an administrator to request the necessary access."
