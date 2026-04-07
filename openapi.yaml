@@ -2,13 +2,25 @@
   "openapi": "3.0.1",
   "info": {
     "title": "Biere Catalog API",
-    "description": "API for managing beers, breweries, styles, and countries.",
+    "description": "API for managing beers, breweries, styles, and countries. \n ## Authentication \nAll protected endpoints require a Bearer JWT token obtained via `POST /v1/users/login`.\n The token contains **scopes** that define what operations the caller is authorized to perform.\n\n## Scopes\n | Scope | Description |\n            |---|---|\n            | `beers:read` | Read beer resources (list, get) |\n            | `beers:write` | Create, update and delete beers |\n            | `breweries:read` | Read brewery resources |\n            | `breweries:write` | Create, update and delete breweries |\n            | `countries:read` | Read country resources |\n            | `countries:write` | Create, update and delete countries |\n            | `styles:read` | Read style resources |\n            | `styles:write` | Create, update and delete styles |\n\n ## Idempotency\n All state-changing operations (POST, PUT, PATCH, DELETE) **require** an `X-Idempotency-Key` header\n containing a unique UUID. Repeating a request with the same key returns the cached response\n without re-executing the operation.\n\n ## Rate Limiting\n Responses include `X-Rate-Limit-Total` and `X-Rate-Limit-Remaining` headers.\n When the limit is exceeded, the API returns `429 Too Many Requests` with a `X-Rate-Limit-Retry-After-Seconds` header.",
+    "contact": {
+      "name": "Biere API Support",
+      "url": "https://biere.catalog.com"
+    },
     "version": "1.0"
   },
   "servers": [
     {
       "url": "http://localhost:8080",
       "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "Bearer Authentication": []
+    },
+    {
+      "Idempotency Key": []
     }
   ],
   "tags": [
@@ -75,8 +87,28 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: styles:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_styles:read"
+            ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -108,6 +140,16 @@
           }
         },
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: styles:write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Style not found",
             "content": {
@@ -128,14 +170,24 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_styles:write"
+            ]
+          }
+        ]
       },
       "delete": {
         "tags": [
           "Styles"
         ],
         "summary": "Delete a style",
-        "description": "Deletes an existing style by ID.",
+        "description": "Permanently removes a style. Ensure no beers are using this style before deleting.",
         "operationId": "deleteStyle",
         "parameters": [
           {
@@ -151,13 +203,26 @@
           }
         ],
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: styles:write"
+          },
+          "204": {
+            "description": "Successfully deleted the style"
+          },
           "404": {
             "description": "Style not found"
-          },
-          "200": {
-            "description": "Successfully deleted the style"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_styles:write"
+            ]
+          }
+        ]
       }
     },
     "/v1/countries/{countryId}": {
@@ -192,6 +257,16 @@
               }
             }
           },
+          "403": {
+            "description": "Insufficient scope. Requires: countries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Country not found",
             "content": {
@@ -202,7 +277,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_countries:read"
+            ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -235,6 +320,16 @@
           "required": true
         },
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: countries:write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Country updated successfully",
             "content": {
@@ -255,14 +350,24 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_countries:write"
+            ]
+          }
+        ]
       },
       "delete": {
         "tags": [
           "Countries"
         ],
         "summary": "Delete a country",
-        "description": "Deletes a country by ID.",
+        "description": "Deletes a country by ID. Ensure no breweries are linked to this country before deleting.",
         "operationId": "deleteCountry",
         "parameters": [
           {
@@ -278,6 +383,16 @@
           }
         ],
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: countries:write",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "204": {
             "description": "Country deleted successfully",
             "content": {
@@ -298,7 +413,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_countries:write"
+            ]
+          }
+        ]
       }
     },
     "/v1/breweries/{breweryId}": {
@@ -342,15 +467,35 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: breweries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_breweries:read"
+            ]
+          }
+        ]
       },
       "put": {
         "tags": [
           "Breweries"
         ],
         "summary": "Update a brewery",
-        "description": "Updates an existing brewery by ID.",
+        "description": "Updates an existing brewery. You can change the name or country. Verify the country ID exists via \u0027GET /v1/countries\u0027 if updating the location.",
         "operationId": "updateCountry_1",
         "parameters": [
           {
@@ -395,15 +540,35 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: breweries:write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_breweries:write"
+            ]
+          }
+        ]
       },
       "delete": {
         "tags": [
           "Breweries"
         ],
         "summary": "Delete a brewery",
-        "description": "Deletes an existing brewery based on the ID.",
+        "description": "Permanently removes a brewery. This action is irreversible.",
         "operationId": "deleteBrewery",
         "parameters": [
           {
@@ -419,13 +584,26 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successfully deleted"
           },
           "404": {
             "description": "Brewery not found"
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: breweries:write"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_breweries:write"
+            ]
+          }
+        ]
       }
     },
     "/v1/users": {
@@ -476,11 +654,11 @@
           "Users"
         ],
         "summary": "Refresh Token",
-        "description": "Refreshes the authentication token.",
+        "description": "Refreshes the authentication session. Use this when the \u0027access_token\u0027 expires (indicated by a 401 response with \u0027invalid-token\u0027 type). Provides a new access/refresh token pair without requiring full login.",
         "operationId": "refreshToken",
         "responses": {
           "401": {
-            "description": "Invalid or expired token",
+            "description": "Invalid or expired token. If refreshing fails, you must re-authenticate via \u0027POST /v1/users/login\u0027.",
             "content": {
               "application/json": {
                 "schema": {
@@ -508,7 +686,7 @@
           "Users"
         ],
         "summary": "Login",
-        "description": "Authenticates a user and returns a token.",
+        "description": "Authenticates a user. This is the first step for any state-changing operation. If successful, you will receive an \u0027access_token\u0027 to be used in the \u0027Authorization: Bearer\u0027 header of subsequent requests.",
         "operationId": "getToken",
         "requestBody": {
           "content": {
@@ -532,7 +710,7 @@
             }
           },
           "401": {
-            "description": "Invalid credentials",
+            "description": "Invalid credentials. If this fails, do not retry automatically without ensuring credentials are correct.",
             "content": {
               "application/json": {
                 "schema": {
@@ -550,9 +728,19 @@
           "Styles"
         ],
         "summary": "Get all styles",
-        "description": "Retrieves a list of all available beer styles.",
+        "description": "Retrieves all available beer styles. This is a discovery endpoint for obtaining valid \u0027style_id\u0027 values required for beer registration.",
         "operationId": "getStyles",
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: styles:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successfully retrieved list",
             "content": {
@@ -563,14 +751,24 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_styles:read"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
           "Styles"
         ],
         "summary": "Register a new style",
-        "description": "Creates a new beer style.",
+        "description": "Creates a new beer style. Verify if the style already exists via \u0027GET /v1/styles\u0027 before creating a new one to avoid duplicates.",
         "operationId": "register",
         "requestBody": {
           "content": {
@@ -593,8 +791,18 @@
               }
             }
           },
+          "403": {
+            "description": "Insufficient scope. Requires: styles:write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOStyleResponseDTO"
+                }
+              }
+            }
+          },
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input or style already exists. Check the \u0027remediation\u0027 field in the response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -603,7 +811,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_styles:write"
+            ]
+          }
+        ]
       }
     },
     "/v1/countries": {
@@ -612,9 +830,19 @@
           "Countries"
         ],
         "summary": "Get all countries",
-        "description": "Retrieves a list of all countries.",
+        "description": "Retrieves all countries. Use this to find the correct \u0027country_id\u0027 when managing breweries. Cache this list if doing multiple operations.",
         "operationId": "getCountries",
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: countries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successfully retrieved list",
             "content": {
@@ -625,14 +853,24 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_countries:read"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
           "Countries"
         ],
         "summary": "Register a new country",
-        "description": "Creates a new country.",
+        "description": "Creates a new country. Countries are base resources. Create one before registering a brewery if it does not yet exist in the system.",
         "operationId": "registerCountry",
         "requestBody": {
           "content": {
@@ -645,8 +883,18 @@
           "required": true
         },
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: countries:write",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOCountryResponseDTO"
+                }
+              }
+            }
+          },
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input. Check the \u0027remediation\u0027 field for instructions on how to proceed.",
             "content": {
               "application/json": {
                 "schema": {
@@ -665,7 +913,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_countries:write"
+            ]
+          }
+        ]
       }
     },
     "/v1/breweries": {
@@ -674,9 +932,24 @@
           "Breweries"
         ],
         "summary": "Get all breweries",
-        "description": "Retrieves a list of all breweries.",
+        "description": "Retrieves all breweries. Use this to discover valid \u0027brewery_id\u0027 values before performing beer registrations.",
         "operationId": "getBreweries",
         "responses": {
+          "403": {
+            "description": "Insufficient scope. Requires: breweries:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successfully retrieved list",
             "content": {
@@ -692,14 +965,24 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_breweries:read"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
           "Breweries"
         ],
         "summary": "Register a new brewery",
-        "description": "Creates a new brewery.",
+        "description": "Registers a new brewery. A valid \u0027country_id\u0027 is required. Obtain valid countries via \u0027GET /v1/countries\u0027 before calling this endpoint.",
         "operationId": "register_1",
         "requestBody": {
           "content": {
@@ -712,8 +995,8 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Invalid input",
+          "403": {
+            "description": "Insufficient scope. Requires: breweries:write",
             "content": {
               "application/json": {
                 "schema": {
@@ -741,8 +1024,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid input. Refer to \u0027remediation\u0027 and \u0027invalid-params\u0027 in the response for recovery steps.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBreweryResponseDTO"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_breweries:write"
+            ]
+          }
+        ]
       }
     },
     "/v1/beers": {
@@ -751,7 +1059,7 @@
           "Beers"
         ],
         "summary": "Get all beers (JSON)",
-        "description": "Retrieves a paginated list of beers in JSON format.",
+        "description": "Retrieves a paginated list of beers. For autonomous navigation, prefer using the HATEOAS links in the \u0027page\u0027 metadata (first, last, next, previous) instead of building URLs manually.",
         "operationId": "getBeersCsv",
         "parameters": [
           {
@@ -775,15 +1083,43 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: beers:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOBeerResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCollectionResponseDTOListApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "Idempotency Key": []
+          },
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_beers:read"
+            ]
+          }
+        ]
       },
       "post": {
         "tags": [
           "Beers"
         ],
         "summary": "Register a new beer",
-        "description": "Creates a new beer record.",
+        "description": "Creates a new beer record. Before calling this, ensure you have valid \u0027brewery_id\u0027 and \u0027style_id\u0027. Obtain them from \u0027GET /v1/breweries\u0027 and \u0027GET /v1/styles\u0027 respectively. You MUST include a unique \u0027X-Idempotency-Key\u0027 header.",
         "operationId": "register_2",
         "requestBody": {
           "content": {
@@ -812,7 +1148,22 @@
             }
           },
           "400": {
-            "description": "Invalid input",
+            "description": "Invalid input. Check \u0027invalid-params\u0027 in the response for prescriptive correction.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              },
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: beers:write",
             "content": {
               "application/json": {
                 "schema": {
@@ -826,7 +1177,20 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_beers:write"
+            ]
+          },
+          {
+            "Idempotency Key": []
+          }
+        ]
       }
     },
     "/v1/beers/{beerId}": {
@@ -835,7 +1199,7 @@
           "Beers"
         ],
         "summary": "Get a specific beer",
-        "description": "Retrieves details of a specific beer by ID.",
+        "description": "Retrieves details of a specific beer. Use this to verify the current state before performing an update or delete operation.",
         "operationId": "getSpecificBeer",
         "parameters": [
           {
@@ -852,7 +1216,7 @@
         ],
         "responses": {
           "404": {
-            "description": "Beer not found",
+            "description": "Beer not found. If this occurs during a loop, verify the ID from the collection list.",
             "content": {
               "application/json": {
                 "schema": {
@@ -870,15 +1234,38 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: beers:read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_beers:read"
+            ]
+          },
+          {
+            "Idempotency Key": []
+          }
+        ]
       },
       "delete": {
         "tags": [
           "Beers"
         ],
         "summary": "Delete a beer",
-        "description": "Deletes a beer by ID.",
+        "description": "Permanently removes a beer. This action is irreversible. Confirm the resource exists via \u0027GET /v1/beers/{beerId}\u0027 before deleting.",
         "operationId": "deleteBeer",
         "parameters": [
           {
@@ -897,17 +1284,33 @@
           "404": {
             "description": "Beer not found"
           },
+          "403": {
+            "description": "Insufficient scope. Requires: beers:write"
+          },
           "204": {
             "description": "Beer deleted successfully"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_beers:write"
+            ]
+          },
+          {
+            "Idempotency Key": []
+          }
+        ]
       },
       "patch": {
         "tags": [
           "Beers"
         ],
         "summary": "Update a beer",
-        "description": "Updates an existing beer by ID.",
+        "description": "Performs a partial update on an existing beer. Only send the fields that need to change. Ensure the beer exists by calling \u0027GET /v1/beers/{beerId}\u0027 first if the ID was not obtained recently.",
         "operationId": "updateBeer",
         "parameters": [
           {
@@ -934,7 +1337,17 @@
         },
         "responses": {
           "404": {
-            "description": "Beer not found",
+            "description": "Beer not found. Check if the resource was deleted by another process.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient scope. Requires: beers:write",
             "content": {
               "application/json": {
                 "schema": {
@@ -953,7 +1366,20 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          },
+          {
+            "OAuth2 Scopes": [
+              "SCOPE_beers:write"
+            ]
+          },
+          {
+            "Idempotency Key": []
+          }
+        ]
       }
     },
     "/v1/users/{userId}": {
@@ -1580,6 +2006,28 @@
           }
         }
       },
+      "ApiCollectionResponseDTOListApiIndividualResponseDTOBeerResponseDTO": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of data objects",
+            "items": {
+              "$ref": "#/components/schemas/ApiIndividualResponseDTOBeerResponseDTO"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageDTO"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        },
+        "description": "Generic wrapper for a collection resource response"
+      },
       "Link": {
         "type": "object",
         "properties": {
@@ -1608,6 +2056,41 @@
             "type": "boolean"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "Bearer Authentication": {
+        "type": "http",
+        "description": "\n            JWT token obtained via `POST /v1/users/login`. The token payload contains a `scopes` claim\n            listing the permissions granted to the caller. Use `Authorization: Bearer \u003ctoken\u003e` header.\n        ",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "OAuth2 Scopes": {
+        "type": "oauth2",
+        "description": "Scopes embedded in the JWT token that control access to API resources.",
+        "flows": {
+          "password": {
+            "tokenUrl": "/v1/users/login",
+            "refreshUrl": "/v1/users/refresh-token",
+            "scopes": {
+              "SCOPE_beers:read": "Read beer resources (list and get)",
+              "SCOPE_beers:write": "Create, update and delete beers",
+              "SCOPE_breweries:read": "Read brewery resources",
+              "SCOPE_breweries:write": "Create, update and delete breweries",
+              "SCOPE_countries:read": "Read country resources",
+              "SCOPE_countries:write": "Create, update and delete countries",
+              "SCOPE_styles:read": "Read style resources",
+              "SCOPE_styles:write": "Create, update and delete styles",
+              "SCOPE_users:write": "Register and remove user accounts"
+            }
+          }
+        }
+      },
+      "Idempotency Key": {
+        "type": "apiKey",
+        "description": "\n            A unique client-generated UUID (e.g. `uuid4()`) that identifies a specific request.\n            Required for all state-changing operations. The server caches the response and replays it\n            for any subsequent request with the same key, preventing duplicate side-effects.\n        ",
+        "name": "X-Idempotency-Key",
+        "in": "header"
       }
     }
   }

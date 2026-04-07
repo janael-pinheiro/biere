@@ -10,7 +10,9 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @Profile("test")
-class TestConfigurationSecurity {
+class TestConfigurationSecurity(
+    private val idempotencyFilter: com.biere.catalog.infrastructure.configuration.IdempotencyFilter
+) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
@@ -18,6 +20,7 @@ class TestConfigurationSecurity {
             .authorizeHttpRequests { auth ->
                 auth.anyRequest().permitAll()
             }
+            .addFilterAfter(idempotencyFilter, org.springframework.security.web.authentication.AnonymousAuthenticationFilter::class.java)
         return http.build()
     }
 

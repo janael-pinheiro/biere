@@ -22,12 +22,12 @@ class CountryOutputAdapter(
     }
 
     override fun findById(id: Long): CountryModel {
-        val country = countryRepository.findById(id).orElseThrow { NotFoundException("Country $id not found.") }
+        val country = countryRepository.findById(id).orElseThrow { NotFoundException(message = "Country $id not found.", remediation = "You need to check if a country with that id has already been registered or correct the country's id.") }
         return mapToModel(country)
     }
 
     override fun update(id: Long, name: String): CountryModel {
-        val country = countryRepository.findById(id).orElseThrow { NotFoundException("Country $id not found.") }
+        val country = countryRepository.findById(id).orElseThrow { NotFoundException(message = "Country $id not found.", remediation = "You need to check if a country with that id has already been registered or correct the country's id.") }
         country.name = name
         return mapToModel(countryRepository.save(country))
     }

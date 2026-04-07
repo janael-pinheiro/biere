@@ -21,12 +21,12 @@ class StyleOutputAdapter(
     }
 
     override fun findById(id: Long): StyleResponseModel {
-        val style = styleRepository.findById(id).orElseThrow { NotFoundException("Style $id not found.") }
+        val style = styleRepository.findById(id).orElseThrow { NotFoundException(message = "Style $id not found.", remediation = "You need to check if a style with that id has already been registered or correct the style's id.") }
         return mapToModel(style)
     }
 
     override fun update(id: Long, name: String): StyleResponseModel {
-        val style = styleRepository.findById(id).orElseThrow { NotFoundException("Style $id not found.") }
+        val style = styleRepository.findById(id).orElseThrow { NotFoundException(message = "Style $id not found.", remediation = "You need to check if a style with that id has already been registered or correct the style's id.") }
         style.name = name
         return mapToModel(styleRepository.save(style))
     }

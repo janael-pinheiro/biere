@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -19,8 +20,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @Profile("dev")
-class SecurityConfiguration(private val authenticationFilter: AuthenticationFilter) {
+class SecurityConfiguration(
+    private val authenticationFilter: AuthenticationFilter,
+    private val idempotencyFilter: IdempotencyFilter,
+    private val correlationIdFilter: CorrelationIdFilter
+) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -30,8 +36,10 @@ class SecurityConfiguration(private val authenticationFilter: AuthenticationFilt
             .authorizeHttpRequests { authorize ->
                 authorize
                     .requestMatchers("/v1/users/login", "/v1/users/refresh-token", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/**", "/error").permitAll()
-                    .anyRequest().hasAuthority("ROLE_USER") }
-            .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter::class.java)
+                    .anyRequest().authenticated() }
+            .addFilterBefore(correlationIdFilter, org.springframework.security.web.header.HeaderWriterFilter::class.java)
+            .addFilterBefore(authenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAfter(idempotencyFilter, AuthenticationFilter::class.java)
         return http.build()
     }
 

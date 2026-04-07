@@ -67,6 +67,7 @@ class BeerPresenterAdapter: BeerPresenterPort {
         val beerDto = ApiIndividualResponseDTO(data = BeerMapper.mapToBeerResponseDTO(input))
         this.addSelfLink(beerDto)
         this.addUpdateLink(beerDto)
+        this.addDeleteLink(beerDto)
         return beerDto
     }
 
@@ -81,7 +82,7 @@ class BeerPresenterAdapter: BeerPresenterPort {
         return beerDto
     }
 
-    override fun prepareUpdateBrewery(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {
+    override fun prepareUpdateBeer(beerModel: OutputBeerModel): ApiIndividualResponseDTO<BeerResponseDTO> {
         return this.prepareGetBeer(beerModel)
     }
 

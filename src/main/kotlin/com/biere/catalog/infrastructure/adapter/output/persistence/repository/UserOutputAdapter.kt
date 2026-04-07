@@ -4,6 +4,7 @@ import com.biere.catalog.domain.model.InputUser
 import com.biere.catalog.domain.port.output.UserOutputPort
 import com.biere.catalog.infrastructure.adapter.output.persistence.entity.UserEntity
 import org.springframework.stereotype.Component
+import java.util.Optional
 
 @Component
 class UserOutputAdapter(
@@ -21,5 +22,9 @@ class UserOutputAdapter(
 
     override fun deleteById(userId: Long) {
         userRepository.deleteById(userId)
+    }
+
+    override fun findByEmail(email: String): Optional<UserEntity> {
+        return userRepository.findByEmail(email)
     }
 }
