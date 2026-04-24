@@ -61,6 +61,26 @@ The API is organized into main resources: Beers, Breweries, Styles, Countries, a
 | `POST` | `/v1/users/refresh-token` | Renews the Access Token using the Refresh Token. |
 | `DELETE` | `/v1/users/{id}` | Removes a user account. |
 
+#### Getting Started with Authentication
+To interact with protected endpoints, you must obtain a **JSON Web Token (JWT)** and include it in the `Authorization` header of your requests as a Bearer token: `Authorization: Bearer <your_token>`.
+
+**How to get the token:**
+Perform a `POST` request to `/v1/users/login` with the user's credentials. The response will contain an `accessToken`.
+
+**Demo Credentials:**
+Since this is a demonstration application, the following credentials are provided for testing purposes:
+
+*   **Administrator User** (Full permissions to all operations):
+    *   **Email:** `admin@biere.com`
+    *   **Password:** `fsdfs`
+*   **Agent User** (Read-only access, can only view data):
+    *   **Email:** `agent@biere.com`
+    *   **Password:** `fsafadfdsfsfsdfsfsfefvakfoaca cdks`
+
+> [!NOTE]
+> These passwords are being shared publicly because this application is for demonstration and portfolio purposes only.
+
+
 ### 🍺 Beers
 *Requires scopes: `beers:read` or `beers:write`.*
 | Method | Endpoint | Description |
